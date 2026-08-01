@@ -1,4114 +1,486 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mental Paws - Juegos Mentales Caninos (Mejorado)</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-/* ESTILOS GLOBALES - MENTAL PAWS */
-
-:root {
-    --bg-dark: #07030d;
-    --bg-phone: #0e071a;
-    --bg-glass: rgba(22, 12, 38, 0.65);
-    --border-glass: rgba(255, 255, 255, 0.08);
-    --primary: #9d4edd;
-    --primary-glow: rgba(157, 78, 221, 0.4);
-    --secondary: #00f5d4;
-    --secondary-glow: rgba(0, 245, 212, 0.3);
-    --accent: #ff007f;
-    --accent-glow: rgba(255, 0, 127, 0.3);
-    --yellow: #ffee32;
-    --green: #390099;
-    --danger: #ff5400;
-    --text-white: #f3f0f7;
-    --text-muted: #a594bd;
-    --font-outfit: 'Outfit', sans-serif;
-    --font-inter: 'Inter', sans-serif;
-    --shadow-neon: 0 0 15px var(--primary-glow);
-    --shadow-neon-cyan: 0 0 15px var(--secondary-glow);
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-}
-
-body {
-    background-color: var(--bg-dark);
-    font-family: var(--font-inter);
-    color: var(--text-white);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    overflow: hidden;
-}
-
-/* CONTENEDOR DE LA APLICACIÓN Y MARCO DE TELÉFONO */
-.app-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100vw;
-    height: 100vh;
-}
-
-.phone-frame {
-    width: 375px;
-    height: 812px;
-    background-color: var(--bg-phone);
-    border-radius: 40px;
-    border: 12px solid #231932;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8),
-                0 0 40px rgba(157, 78, 221, 0.15);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Notch del teléfono simulado */
-.phone-frame::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 150px;
-    height: 25px;
-    background-color: #231932;
-    border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-    z-index: 1000;
-}
-
-/* PANTALLAS (SPA SCREEN STATE) */
-.screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 30px 20px 20px 20px;
-    display: flex;
-    flex-direction: column;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(20px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    z-index: 10;
-}
-
-.screen.active {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-    z-index: 20;
-}
-
-/* ENCABEZADOS DE PANTALLA */
-.screen-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-    margin-bottom: 20px;
-}
-
-.screen-header h2 {
-    font-family: var(--font-outfit);
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--text-white);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-}
-
-.btn-back {
-    background: var(--bg-glass);
-    border: 1px solid var(--border-glass);
-    color: var(--text-white);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 18px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
-}
-
-.btn-back:active {
-    transform: scale(0.9);
-    background: var(--primary);
-}
-
-/* BOTONES ESTILIZADOS */
-.btn {
-    border: none;
-    border-radius: 16px;
-    padding: 16px 24px;
-    font-family: var(--font-outfit);
-    font-size: 16px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.btn span {
-    position: relative;
-    z-index: 2;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, #7b2cbf 100%);
-    color: var(--text-white);
-    box-shadow: var(--shadow-neon);
-}
-
-.btn-primary::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -50%;
-    width: 200%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transform: skewX(-20deg);
-    transition: 0.75s;
-    opacity: 0;
-}
-
-.btn-primary:hover::after {
-    left: 120%;
-    opacity: 1;
-}
-
-.btn-primary:active {
-    transform: scale(0.95);
-    box-shadow: 0 0 5px var(--primary-glow);
-}
-
-.btn-secondary {
-    background: var(--bg-glass);
-    border: 1px solid var(--border-glass);
-    color: var(--text-white);
-    box-shadow: var(--glass-shadow);
-}
-
-.btn-secondary:active {
-    transform: scale(0.95);
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* PANTALLA MENU PRINCIPAL */
-#screen-main-menu {
-    justify-content: space-between;
-    padding-top: 80px;
-    padding-bottom: 50px;
-}
-
-.logo-area {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-}
-
-.logo-icon {
-    font-size: 72px;
-    margin-bottom: 20px;
-    animation: float 4s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-#screen-main-menu h1 {
-    font-family: var(--font-outfit);
-    font-size: 36px;
-    font-weight: 800;
-    color: var(--text-white);
-    letter-spacing: 2px;
-    background: linear-gradient(to right, #fff, #b388ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 10px;
-    text-shadow: 0 4px 20px rgba(157, 78, 221, 0.3);
-}
-
-.subtitle {
-    color: var(--text-muted);
-    font-size: 14px;
-    max-width: 260px;
-    line-height: 1.4;
-}
-
-.menu-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 100%;
-}
-
-.footer-note {
-    text-align: center;
-    font-size: 11px;
-    color: var(--text-muted);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    opacity: 0.7;
-}
-
-/* SELECCIÓN DE PERRITOS (CHARACTERS) */
-.characters-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    overflow-y: auto;
-    max-height: 240px;
-    padding-bottom: 10px;
-}
-
-/* Ocultar barra de scroll en grid pero mantener scroll funcional */
-.characters-grid::-webkit-scrollbar {
-    display: none;
-}
-
-.character-card {
-    background: var(--bg-glass);
-    border: 1px solid var(--border-glass);
-    border-radius: 16px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-    position: relative;
-}
-
-.character-card.active {
-    border-color: var(--secondary);
-    box-shadow: var(--shadow-neon-cyan);
-    transform: scale(1.05);
-}
-
-.character-card img {
-    width: 55px;
-    height: 55px;
-    border-radius: 12px;
-    object-fit: cover;
-    margin-bottom: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.card-avatar-fallback {
-    width: 55px;
-    height: 55px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #3d1b5c 0%, #1e0b30 100%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
-    margin-bottom: 8px;
-    color: var(--text-white);
-}
-
-.character-card p {
-    font-size: 11px;
-    font-weight: 600;
-    text-align: center;
-    color: var(--text-white);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
-}
-
-.character-detail {
-    background: rgba(19, 10, 36, 0.8);
-    border: 1px solid var(--border-glass);
-    border-radius: 20px;
-    padding: 15px;
-    flex-grow: 1;
-    margin-top: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.detail-header {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.detail-img {
-    width: 70px;
-    height: 70px;
-    border-radius: 16px;
-    object-fit: cover;
-}
-
-.detail-fallback {
-    width: 70px;
-    height: 70px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, var(--primary) 0%, #1e0b30 100%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 32px;
-}
-
-.detail-meta h3 {
-    font-family: var(--font-outfit);
-    font-size: 18px;
-    margin-bottom: 2px;
-}
-
-.detail-meta .tag-protagonist {
-    background: var(--accent);
-    color: white;
-    font-size: 8px;
-    padding: 2px 6px;
-    border-radius: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-}
-
-.detail-meta .tag-unlock {
-    background: var(--bg-glass);
-    border: 1px solid var(--border-glass);
-    color: var(--text-muted);
-    font-size: 8px;
-    padding: 2px 6px;
-    border-radius: 10px;
-    font-weight: 600;
-}
-
-.skill-description {
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    padding: 10px;
-    font-size: 12px;
-    line-height: 1.4;
-    margin-bottom: 10px;
-}
-
-.skill-description strong {
-    color: var(--secondary);
-    display: block;
-    margin-bottom: 3px;
-    font-family: var(--font-outfit);
-    font-size: 13px;
-}
-
-/* SELECCIÓN DE NIVELES */
-.levels-map {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    padding: 10px;
-    overflow-y: auto;
-}
-
-.level-node {
-    aspect-ratio: 1;
-    background: var(--bg-glass);
-    border: 2px solid var(--border-glass);
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.2s;
-}
-
-.level-node.unlocked {
-    border-color: var(--primary);
-    background: linear-gradient(135deg, rgba(157, 78, 221, 0.2) 0%, rgba(14, 7, 26, 0.8) 100%);
-}
-
-.level-node.completed {
-    border-color: var(--secondary);
-    background: linear-gradient(135deg, rgba(0, 245, 212, 0.2) 0%, rgba(14, 7, 26, 0.8) 100%);
-}
-
-.level-node:active {
-    transform: scale(0.9);
-}
-
-.level-node .num {
-    font-family: var(--font-outfit);
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--text-white);
-}
-
-.level-node .stars {
-    font-size: 10px;
-    margin-top: 4px;
-    color: var(--yellow);
-}
-
-.level-node.locked {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.level-node.locked::after {
-    content: '🔒';
-    position: absolute;
-    font-size: 16px;
-    bottom: 8px;
-}
-
-/* TABLERO DE JUEGO (GAMEPLAY) */
-#screen-gameplay {
-    padding: 40px 15px 15px 15px;
-    justify-content: space-between;
-}
-
-.gameplay-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 5px;
-}
-
-.btn-icon-header {
-    background: var(--bg-glass);
-    border: 1px solid var(--border-glass);
-    color: var(--text-white);
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-}
-
-.level-indicator {
-    font-family: var(--font-outfit);
-    font-size: 18px;
-    font-weight: 800;
-}
-
-.btn-skip {
-    background: rgba(255, 84, 0, 0.15);
-    border: 1px solid var(--danger);
-    border-radius: 20px;
-    padding: 6px 12px;
-    color: #ffaa7f;
-    font-family: var(--font-outfit);
-    font-size: 12px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.btn-skip:active {
-    transform: scale(0.9);
-}
-
-.gameplay-status {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--bg-glass);
-    border: 1px solid var(--border-glass);
-    border-radius: 12px;
-    padding: 8px 12px;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.status-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.font-hemisphere {
-    font-family: var(--font-outfit);
-    color: var(--secondary);
-    text-transform: uppercase;
-    font-size: 11px;
-    letter-spacing: 0.5px;
-}
-
-.game-instruction {
-    font-size: 12px;
-    color: var(--text-muted);
-    text-align: center;
-    background: rgba(255, 255, 255, 0.02);
-    padding: 6px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    min-height: 34px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* ÁREA DE CONTENEDOR DE JUEGO (CANVAS + CAPAS) */
-.game-board-container {
-    width: 100%;
-    height: 420px;
-    background: #110922;
-    border: 2px solid var(--border-glass);
-    border-radius: 24px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
-}
-
-#game-canvas {
-    width: 100%;
-    height: 100%;
-    display: block;
-}
-
-.html-game-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 15;
-}
-
-/* BARRA DE ACCIÓN DEL PERSONAJE */
-.character-action-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--bg-glass);
-    border: 1px solid var(--border-glass);
-    border-radius: 20px;
-    padding: 10px;
-    margin-top: 10px;
-    gap: 10px;
-}
-
-.active-dog-preview {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-grow: 1;
-}
-
-.active-dog-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    object-fit: cover;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.active-dog-fallback {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--primary) 0%, #1c0936 100%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-}
-
-.active-dog-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.active-dog-name {
-    font-family: var(--font-outfit);
-    font-size: 13px;
-    font-weight: 800;
-}
-
-.active-dog-skill {
-    font-size: 10px;
-    color: var(--text-muted);
-}
-
-/* BOTÓN DE DESPARAR HABILIDAD */
-.btn-skill-trigger {
-    background: linear-gradient(135deg, var(--secondary) 0%, #00bbf9 100%);
-    border: none;
-    border-radius: 14px;
-    padding: 10px 16px;
-    color: #07030d;
-    font-family: var(--font-outfit);
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    box-shadow: var(--shadow-neon-cyan);
-    transition: transform 0.2s, box-shadow 0.2s;
-    height: 44px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.btn-skill-glow {
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 60%);
-    animation: rotateGlow 3s linear infinite;
-}
-
-@keyframes rotateGlow {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.btn-skill-trigger span {
-    position: relative;
-    z-index: 2;
-}
-
-.btn-skill-trigger:active {
-    transform: scale(0.95);
-    box-shadow: 0 0 5px var(--secondary-glow);
-}
-
-.skill-cooldown-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 3;
-    width: 0%;
-    transition: width 0.1s linear;
-}
-
-.btn-skill-trigger.disabled {
-    background: #2a2235;
-    box-shadow: none;
-    color: var(--text-muted);
-    cursor: not-allowed;
-}
-
-.btn-skill-trigger.disabled .btn-skill-glow {
-    display: none;
-}
-
-/* MODALES (VISTAS OVERLAYS) */
-.modal-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(7, 3, 13, 0.85);
-    backdrop-filter: blur(8px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    padding: 20px;
-}
-
-.modal-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.modal-content {
-    background: var(--bg-glass);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 28px;
-    padding: 24px;
-    width: 100%;
-    max-width: 320px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    transform: scale(0.9);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.modal-overlay.active .modal-content {
-    transform: scale(1);
-}
-
-.modal-content h3 {
-    font-family: var(--font-outfit);
-    font-size: 22px;
-    font-weight: 800;
-    margin-bottom: 15px;
-    letter-spacing: 0.5px;
-}
-
-.modal-content p {
-    font-size: 13px;
-    color: var(--text-muted);
-    line-height: 1.5;
-    margin-bottom: 20px;
-}
-
-.modal-content .btn {
-    margin-bottom: 10px;
-}
-
-.modal-content .btn:last-child {
-    margin-bottom: 0;
-}
-
-/* ÁREA DE SCROLL DE AYUDA */
-.help-scroll-area {
-    width: 100%;
-    max-height: 350px;
-    overflow-y: auto;
-    text-align: left;
-    margin-bottom: 20px;
-    padding-right: 5px;
-}
-
-.help-scroll-area::-webkit-scrollbar {
-    width: 4px;
-}
-
-.help-scroll-area::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 2px;
-}
-
-.help-scroll-area p {
-    margin-bottom: 10px;
-    font-size: 12px;
-}
-
-.help-scroll-area hr {
-    border: 0;
-    height: 1px;
-    background: rgba(255,255,255,0.1);
-    margin: 15px 0;
-}
-
-.help-scroll-area ol {
-    padding-left: 15px;
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 10px;
-}
-
-.help-scroll-area li {
-    margin-bottom: 8px;
-    line-height: 1.4;
-}
-
-/* VISTA DE VICTORIA / DERROTA */
-.victory-icon, .defeat-icon {
-    font-size: 54px;
-    margin-bottom: 15px;
-    animation: bounce 1s infinite alternate;
-}
-
-@keyframes bounce {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-8px); }
-}
-
-.stats-summary {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-    background: rgba(255,255,255,0.03);
-    padding: 10px 20px;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.05);
-    font-size: 12px;
-}
-
-.stats-summary span {
-    color: var(--secondary);
-    font-weight: 700;
-}
-
-/* RESPONSIVIDAD PARA CELULARES */
-@media (max-width: 500px) {
-    body {
-        background-color: var(--bg-phone);
-    }
-    .app-container {
-        width: 100%;
-        height: 100%;
-    }
-    .phone-frame {
-        width: 100vw;
-        height: 100vh;
-        border: none;
-        border-radius: 0;
-        box-shadow: none;
-    }
-    .phone-frame::before {
-        display: none; /* Ocultar notch en pantallas pequeñas */
-    }
-    .screen {
-        padding-top: 40px;
-    }
-}
-
-/* ===== MEJORAS ADICIONALES ===== */
-.screen { transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), filter 0.4s ease; }
-.screen.active { filter: blur(0); }
-.screen:not(.active) { filter: blur(2px); }
-
-@keyframes slideInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes scaleIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3); } 50% { transform: scale(1.05); } 70% { transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
-
-#screen-main-menu.active .logo-area { animation: slideInDown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s both; }
-#screen-main-menu.active .menu-buttons button:nth-child(1) { animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s both; }
-#screen-main-menu.active .menu-buttons button:nth-child(2) { animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.4s both; }
-#screen-main-menu.active .menu-buttons button:nth-child(3) { animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s both; }
-#screen-main-menu.active .menu-buttons button:nth-child(4) { animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.6s both; }
-#screen-main-menu.active .footer-note { animation: fadeIn 0.8s ease 0.7s both; }
-
-#screen-characters.active .screen-header { animation: slideInDown 0.4s ease both; }
-#screen-characters.active .characters-grid .character-card { animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
-#screen-characters.active .characters-grid .character-card:nth-child(1) { animation-delay: 0.1s; }
-#screen-characters.active .characters-grid .character-card:nth-child(2) { animation-delay: 0.15s; }
-#screen-characters.active .characters-grid .character-card:nth-child(3) { animation-delay: 0.2s; }
-#screen-characters.active .characters-grid .character-card:nth-child(4) { animation-delay: 0.25s; }
-#screen-characters.active .characters-grid .character-card:nth-child(5) { animation-delay: 0.3s; }
-#screen-characters.active .characters-grid .character-card:nth-child(6) { animation-delay: 0.35s; }
-#screen-characters.active .characters-grid .character-card:nth-child(7) { animation-delay: 0.4s; }
-#screen-characters.active .character-detail { animation: slideInUp 0.5s ease 0.3s both; }
-
-#screen-levels.active .screen-header { animation: slideInDown 0.4s ease both; }
-#screen-levels.active .level-node { animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both; }
-#screen-levels.active .level-node:nth-child(1) { animation-delay: 0.05s; }
-#screen-levels.active .level-node:nth-child(2) { animation-delay: 0.1s; }
-#screen-levels.active .level-node:nth-child(3) { animation-delay: 0.15s; }
-#screen-levels.active .level-node:nth-child(4) { animation-delay: 0.2s; }
-#screen-levels.active .level-node:nth-child(5) { animation-delay: 0.25s; }
-#screen-levels.active .level-node:nth-child(6) { animation-delay: 0.3s; }
-#screen-levels.active .level-node:nth-child(7) { animation-delay: 0.35s; }
-#screen-levels.active .level-node:nth-child(8) { animation-delay: 0.4s; }
-#screen-levels.active .level-node:nth-child(9) { animation-delay: 0.45s; }
-
-.character-card { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease; }
-.character-card:hover:not(.locked) { transform: translateY(-5px) scale(1.05); box-shadow: 0 10px 30px rgba(157, 78, 221, 0.3); }
-.level-node:not(.locked):hover { transform: scale(1.08); box-shadow: 0 8px 25px rgba(157, 78, 221, 0.3); }
-.btn { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, background-color 0.3s ease; }
-.btn:hover { transform: translateY(-2px); }
-.btn-primary:hover { box-shadow: 0 8px 25px rgba(157, 78, 221, 0.5); }
-.btn-secondary:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
-
-@keyframes glowPulse { 0%, 100% { box-shadow: 0 0 5px var(--primary-glow); } 50% { box-shadow: 0 0 20px var(--primary-glow), 0 0 40px var(--primary-glow); } }
-@keyframes cyanGlowPulse { 0%, 100% { box-shadow: 0 0 5px var(--secondary-glow); } 50% { box-shadow: 0 0 20px var(--secondary-glow), 0 0 40px var(--secondary-glow); } }
-.level-node.unlocked:hover { animation: glowPulse 1.5s ease-in-out infinite; }
-.level-node.completed:hover { animation: cyanGlowPulse 1.5s ease-in-out infinite; }
-.character-card.active { animation: cyanGlowPulse 2s ease-in-out infinite; }
-
-@keyframes logoFloat { 0%, 100% { transform: translateY(0) rotate(0deg); filter: drop-shadow(0 5px 15px rgba(157, 78, 221, 0.3)); } 25% { transform: translateY(-8px) rotate(2deg); } 50% { transform: translateY(-12px) rotate(0deg); filter: drop-shadow(0 15px 30px rgba(157, 78, 221, 0.5)); } 75% { transform: translateY(-8px) rotate(-2deg); } }
-.logo-icon { animation: logoFloat 4s ease-in-out infinite; }
-
-@keyframes titleShine { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
-#screen-main-menu h1 { background-size: 200% auto; animation: titleShine 3s linear infinite; }
-
-@keyframes timerPulse { 0%, 100% { transform: scale(1); color: var(--text-white); } 50% { transform: scale(1.1); color: var(--danger); } }
-#game-timer.warning { animation: timerPulse 0.8s ease-in-out infinite; color: var(--danger); font-weight: 800; }
-
-@keyframes skillReady { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-.btn-skill-trigger:not(.disabled) { animation: skillReady 2s ease-in-out infinite; }
-.btn-skill-trigger:not(.disabled):hover { animation: none; transform: scale(1.08); }
-
-@keyframes victoryBounce { 0%, 100% { transform: translateY(0) scale(1); } 25% { transform: translateY(-15px) scale(1.1); } 50% { transform: translateY(0) scale(1); } 75% { transform: translateY(-8px) scale(1.05); } }
-.victory-icon { animation: victoryBounce 1.2s ease-in-out infinite; }
-
-@keyframes defeatShake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }
-.defeat-icon { animation: defeatShake 0.8s ease-in-out; }
-
-@keyframes confettiFall { 0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
-.confetti { position: fixed; width: 10px; height: 10px; z-index: 9999; pointer-events: none; animation: confettiFall 3s linear forwards; }
-
-@keyframes notificationSlide { 0% { transform: translateX(120%); opacity: 0; } 15% { transform: translateX(0); opacity: 1; } 85% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(120%); opacity: 0; } }
-.floating-notification { position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, var(--primary) 0%, #7b2cbf 100%); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 16px 20px; color: white; font-family: var(--font-outfit); z-index: 10000; box-shadow: 0 10px 30px rgba(157, 78, 221, 0.4); animation: notificationSlide 4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; max-width: 300px; display: flex; align-items: center; gap: 12px; }
-
-@keyframes comboPop { 0% { transform: scale(0) rotate(-10deg); } 50% { transform: scale(1.3) rotate(5deg); } 100% { transform: scale(1) rotate(0deg); } }
-.combo-indicator { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: var(--font-outfit); font-size: 36px; font-weight: 800; color: var(--yellow); text-shadow: 0 0 20px rgba(255, 238, 50, 0.5); pointer-events: none; animation: comboPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; z-index: 50; }
-
-@keyframes damageFlash { 0%, 100% { filter: brightness(1); } 25% { filter: brightness(2) hue-rotate(-30deg); } 50% { filter: brightness(1.5) hue-rotate(-15deg); } 75% { filter: brightness(2) hue-rotate(-30deg); } }
-.damage-flash { animation: damageFlash 0.4s ease-in-out; }
-
-@keyframes shieldPulse { 0%, 100% { box-shadow: 0 0 5px rgba(0, 245, 212, 0.5); } 50% { box-shadow: 0 0 20px rgba(0, 245, 212, 0.8), 0 0 40px rgba(0, 245, 212, 0.4); } }
-.shield-active { animation: shieldPulse 1s ease-in-out infinite; }
-
-@keyframes starSpin { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }
-.star-animated { display: inline-block; animation: starSpin 2s ease-in-out infinite; }
-
-@keyframes ripple { 0% { transform: scale(0); opacity: 0.5; } 100% { transform: scale(4); opacity: 0; } }
-.ripple-effect { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.3); pointer-events: none; animation: ripple 0.6s ease-out forwards; }
-
-@keyframes particleFloat { 0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; } 25% { transform: translate(10px, -20px) scale(1.2); opacity: 0.6; } 50% { transform: translate(-5px, -40px) scale(0.8); opacity: 0.4; } 75% { transform: translate(15px, -20px) scale(1.1); opacity: 0.5; } }
-.bg-particle { position: absolute; border-radius: 50%; pointer-events: none; animation: particleFloat 8s ease-in-out infinite; }
-
-
-@keyframes errorVibrate { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-4px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
-.error-vibrate { animation: errorVibrate 0.4s ease-in-out; }
-
-@keyframes successGlow { 0% { box-shadow: 0 0 0 rgba(0, 245, 212, 0); } 50% { box-shadow: 0 0 30px rgba(0, 245, 212, 0.5); } 100% { box-shadow: 0 0 0 rgba(0, 245, 212, 0); } }
-.success-glow { animation: successGlow 0.6s ease-out; }
-
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 3px; }
-::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 3px; }
-
-@media (max-width: 500px) { .floating-notification { right: 10px; left: 10px; max-width: none; } .combo-indicator { font-size: 28px; } }
-
-.achievement-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 12px 15px; display: flex; align-items: center; gap: 12px; transition: all 0.3s ease; }
-.achievement-card.unlocked { background: rgba(157, 78, 221, 0.15); border-color: rgba(157, 78, 221, 0.3); }
-.achievement-card .achievement-icon { font-size: 32px; transition: filter 0.3s; }
-.achievement-card:not(.unlocked) .achievement-icon { filter: grayscale(1); }
-.achievement-card .achievement-info { flex-grow: 1; }
-.achievement-card .achievement-name { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; }
-.achievement-card.unlocked .achievement-name { color: var(--text-white); }
-.achievement-card:not(.unlocked) .achievement-name { color: var(--text-muted); }
-.achievement-card .achievement-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-.achievement-card .achievement-status { font-size: 14px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mascota Matemática — Papel Quest</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F1E4C3;--paper-dark:#E4D3A8;--ink:#2B2118;--teal:#1E6F5C;--teal-dark:#154F42;--red:#C1443B;--gold:#D9A441;--steel:#4C6B82;--white-paper:#FBF6E9}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;background:repeating-linear-gradient(45deg,rgba(0,0,0,0.015)0 2px,transparent 2px 6px),var(--paper);font-family:Nunito,sans-serif;color:var(--ink);overflow:hidden;user-select:none;touch-action:manipulation}
+h1,h2,h3{font-family:'Baloo 2',sans-serif}
+.torn{clip-path:polygon(0% 2%,3% 0%,8% 1.5%,14% 0%,20% 1.8%,27% 0.2%,34% 1.6%,41% 0%,48% 1.2%,55% 0.3%,62% 1.7%,69% 0.1%,76% 1.4%,83% 0.5%,90% 1.9%,97% 0.4%,100% 2%,100% 98%,97% 100%,91% 98.4%,84% 100%,77% 98.2%,70% 99.8%,63% 98.3%,56% 100%,49% 98.7%,42% 99.6%,35% 98.2%,28% 99.9%,21% 98.5%,14% 99.7%,7% 98.3%,0% 100%)}
+#app{position:relative;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center}
+.btn{font-family:'Baloo 2',sans-serif;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:transform .08s,box-shadow .08s;font-size:14px;padding:8px 20px;color:var(--white-paper);background:var(--teal);box-shadow:0 4px 0 var(--teal-dark)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--teal-dark)}
+.btn.gold{background:var(--gold);color:var(--ink);box-shadow:0 4px 0 #b8882e}
+.btn.red{background:var(--red);box-shadow:0 4px 0 var(--red-dark)}
+
+/* MAIN GAME */
+#game-wrap{background:var(--white-paper);border:5px solid var(--ink);border-radius:2rem;padding:16px 20px 18px;width:480px;max-width:96vw;box-shadow:0 10px 0 -4px rgba(0,0,0,.12),0 6px 24px rgba(0,0,0,.2);position:relative}
+#game-wrap .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+#game-wrap .top-bar h1{font-size:17px;color:var(--teal-dark);margin:0}
+#game-wrap .top-bar .star-count{font-weight:800;font-size:13px}
+.pet-area{text-align:center;padding:6px 0;position:relative;min-height:110px}
+.pet-area .pet-emoji{font-size:64px;display:block;cursor:pointer;transition:transform .1s;animation:bob 1.2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.pet-area .pet-emoji:active{transform:scale(1.2)}
+.pet-area .pet-name{font-weight:800;font-size:15px;margin:2px 0 0}
+.pet-area .pet-mood{font-size:11px;color:#5a4c38;min-height:16px}
+
+/* LEVEL BAR */
+.level-bar{display:flex;align-items:center;gap:6px;margin:4px 0 2px}
+.level-bar .lv-label{font-weight:800;font-size:11px;color:var(--teal-dark);font-family:'Baloo 2';white-space:nowrap}
+.level-bar .lv-wrap{flex:1;height:10px;background:#ddd0ad;border-radius:5px;overflow:hidden;border:1px solid var(--ink)}
+.level-bar .lv-fill{height:100%;background:linear-gradient(90deg,var(--teal),#3aa17c);border-radius:5px;transition:width .4s}
+.level-bar .lv-xp{font-size:10px;font-weight:800;color:#5a4c38;white-space:nowrap}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:6px 0}
+.stat-item{background:var(--paper);border:2px solid var(--ink);border-radius:8px;padding:5px 8px;display:flex;align-items:center;gap:6px}
+.stat-item .s-icon{font-size:14px;width:20px;text-align:center}
+.stat-item .s-bar-wrap{flex:1;height:8px;background:#ddd0ad;border-radius:4px;overflow:hidden}
+.stat-item .s-bar{height:100%;border-radius:4px;transition:width .3s}
+.s-hambre .s-bar{background:linear-gradient(90deg,#f7971e,#ffd200)}
+.s-felicidad .s-bar{background:linear-gradient(90deg,#ff4081,#f50057)}
+.s-energia .s-bar{background:linear-gradient(90deg,#4caf50,#66bb6a)}
+.s-salud .s-bar{background:linear-gradient(90deg,#2196f3,#42a5f5)}
+.stat-item .s-val{font-size:10px;font-weight:800;min-width:22px;text-align:right}
+
+/* GAME MODE BUTTONS */
+.games-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin:8px 0}
+.game-btn{background:var(--paper);border:3px solid var(--ink);border-radius:12px;padding:12px 4px;cursor:pointer;transition:transform .1s;text-align:center;touch-action:manipulation}
+.game-btn:active{transform:scale(.95)}
+.game-btn .g-icon{font-size:26px;display:block}
+.game-btn .g-title{font-weight:800;font-size:11px;margin:2px 0}
+.game-btn .g-reward{font-size:9px;color:#5a4c38}
+.game-btn.locked{opacity:.4;pointer-events:none}
+
+/* PUZZLE OVERLAY */
+.overlay{display:none;position:absolute;inset:0;background:rgba(20,14,8,0.5);z-index:10;border-radius:2rem;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.panel{background:var(--white-paper);border:4px solid var(--ink);border-radius:1.5rem;padding:18px 16px;min-width:280px;width:92vw;max-width:400px;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+.panel h2{font-size:18px;color:var(--teal-dark);margin:0 0 4px}
+.panel .sub{font-size:11px;color:#5a4c38;margin-bottom:8px}
+.panel .math{font-size:34px;font-weight:900;margin:8px 0;font-family:'Baloo 2'}
+.panel .math .sym{color:var(--gold)}
+.panel .math .eq{color:var(--teal)}
+.panel .opts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.panel .opt{background:var(--paper);border:3px solid var(--ink);border-radius:12px;padding:12px 6px;font-size:20px;font-weight:800;cursor:pointer;font-family:'Baloo 2';transition:transform .1s;touch-action:manipulation;min-height:48px}
+.panel .opt:active{transform:scale(.95);background:var(--paper-dark)}
+.panel .opt.correct{background:#8fd19e;border-color:var(--teal)}
+.panel .opt.wrong{background:#e08a7a;border-color:var(--red)}
+.panel .msg{font-size:12px;font-weight:800;min-height:18px}
+.panel .msg.good{color:var(--teal)}
+.panel .msg.bad{color:var(--red)}
+.panel .timer-bar{height:10px;background:#ddd0ad;border-radius:4px;overflow:hidden;margin:6px 0}
+.panel .timer-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--red));border-radius:4px;transition:width .15s}
+.panel .streak{font-size:11px;color:#5a4c38}
+
+/* GRID */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px auto;max-width:260px}
+.gcell{aspect-ratio:1;background:var(--paper);border:3px solid var(--ink);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;cursor:pointer;font-family:'Baloo 2';touch-action:manipulation}
+.gcell:active{transform:scale(.92)}
+.gcell.sel{background:var(--gold);border-color:var(--teal-dark);transform:scale(1.06)}
+.gcell.ok{background:#8fd19e;border-color:var(--teal);cursor:default;opacity:.6}
+.gcell.bad{background:#e08a7a;border-color:var(--red);animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+
+/* MEMORY */
+.seq-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:10px 0;min-height:56px}
+.snum{width:48px;height:58px;background:rgba(255,255,255,.3);border:3px solid var(--ink);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;font-family:'Baloo 2';transition:all .3s;animation:fadeIn .25s}
+.snum.hide{color:transparent;border-color:#ddd0ad;transform:scale(.95)}
+@keyframes fadeIn{0%{opacity:0;transform:translateY(8px)scale(.85)}100%{opacity:1;transform:translateY(0)scale(1)}}
+
+/* EVOLUTION BADGE */
+.evo-badge{display:inline-block;background:var(--teal);color:#fff;font-size:9px;padding:2px 10px;border-radius:10px;font-weight:700;letter-spacing:1px;margin-bottom:4px}
+
+/* CLOSE X */
+.close-x{position:absolute;top:-10px;right:-10px;font-size:22px;font-weight:800;cursor:pointer;color:#fff;background:var(--red);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:15;box-shadow:0 2px 6px rgba(0,0,0,.4);transition:transform .1s}
+.close-x:hover{transform:scale(1.15)}
+/* TOAST */
+#toast{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--white-paper);padding:4px 14px;font-weight:800;font-family:'Baloo 2';z-index:20;opacity:0;transition:opacity .3s;pointer-events:none;border-radius:6px;font-size:12px}
+@media(max-width:420px){
+  #game-wrap{border-radius:1.2rem;padding:12px 10px 14px;width:100vw;max-width:100vw;border-left:none;border-right:none;border-bottom-width:4px}
+  .pet-area .pet-emoji{font-size:50px}
+  .stats-row{gap:4px}
+  .stat-item{padding:4px 6px;border-radius:6px}
+  .stat-item .s-val{font-size:9px;min-width:18px}
+  .stat-item .s-icon{font-size:12px;width:16px}
+  .games-row{gap:4px}
+  .game-btn{border-radius:8px;padding:8px 2px}
+  .game-btn .g-icon{font-size:22px}
+  .game-btn .g-title{font-size:10px}
+  .panel{border-radius:1rem;padding:14px 10px;width:96vw;min-width:unset}
+  .panel .math{font-size:28px}
+  .panel .opt{padding:10px 4px;font-size:18px;min-height:44px}
+  .grid-4{gap:4px;max-width:210px}
+  .gcell{font-size:16px;border-radius:8px}
+  .snum{width:38px;height:48px;font-size:18px}
+}
+</style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="phone-frame">
-            <div id="screen-main-menu" class="screen active">
-                <div class="logo-area">
-                    <div class="logo-icon">🧠🐾</div>
-                    <h1>MENTAL PAWS</h1>
-                    <p class="subtitle">Desafía tu mente con tus perritos favoritos</p>
-                </div>
-                <div class="menu-buttons">
-                    <button class="btn btn-primary" onclick="window.gameEngine.switchScreen('screen-levels')"><span>JUGAR</span></button>
-                    <button class="btn btn-secondary" onclick="window.gameEngine.switchScreen('screen-characters')"><span>PERRITOS</span></button>
-                    <button class="btn btn-secondary" onclick="window.gameEngine.openHelpModal()"><span>¿CÓMO JUGAR?</span></button>
-                    <button class="btn btn-secondary" onclick="window.gameEngine.switchScreen('screen-achievements')"><span>🏆 LOGROS</span></button>
-                </div>
-                <div class="footer-note">Usa ambos hemisferios cerebrales</div>
-            </div>
-            <div id="screen-characters" class="screen">
-                <div class="screen-header">
-                    <button class="btn-back" onclick="window.gameEngine.switchScreen('screen-main-menu')">←</button>
-                    <h2>Elegir Perrito</h2><div style="width:40px;"></div>
-                </div>
-                <div class="characters-grid" id="characters-list"></div>
-                <div class="character-detail" id="character-detail-panel"></div>
-            </div>
-            <div id="screen-levels" class="screen">
-                <div class="screen-header">
-                    <button class="btn-back" onclick="window.gameEngine.switchScreen('screen-main-menu')">←</button>
-                    <h2>Niveles</h2><div style="width:40px;"></div>
-                </div>
-                <div class="levels-map" id="levels-map-container"></div>
-            </div>
-            <div id="screen-achievements" class="screen">
-                <div class="screen-header">
-                    <button class="btn-back" onclick="window.gameEngine.switchScreen('screen-main-menu')">←</button>
-                    <h2>Logros</h2><div style="width:40px;"></div>
-                </div>
-                <div class="achievements-container" id="achievements-list" style="overflow-y:auto;flex-grow:1;padding:10px;"></div>
-                <div style="padding:15px;background:var(--bg-glass);border-radius:16px;margin:10px;text-align:center;">
-                    <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">ESTADÍSTICAS</div>
-                    <div id="achievement-stats" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;font-size:11px;"></div>
-                </div>
-            </div>
-            <div id="screen-gameplay" class="screen">
-                <div class="gameplay-header">
-                    <button class="btn-icon-header" onclick="window.gameEngine.pauseGame()">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="5" y="4" width="4" height="16" rx="1"/><rect x="15" y="4" width="4" height="16" rx="1"/></svg>
-                    </button>
-                    <div class="level-indicator" id="current-level-title">Nivel 1</div>
-                    <button class="btn-skip" id="btn-skip-level" onclick="window.gameEngine.skipLevel()"><span>Brincar →</span></button>
-                </div>
-                <div class="gameplay-status">
-                    <div class="status-item"><span class="status-icon">🕒</span><span id="game-timer">30s</span></div>
-                    <div class="status-item"><span class="status-icon">❤️</span><span id="game-lives">❤❤❤</span></div>
-                    <div class="status-item font-hemisphere" id="active-hemisphere">Cerebro: Izquierdo</div>
-                </div>
-                <div class="game-instruction" id="game-instruction-text">¡Cargando instrucciones...!</div>
-                <div class="game-board-container" id="game-board-container">
-                    <canvas id="game-canvas" width="360" height="420"></canvas>
-                    <div id="html-game-overlay" class="html-game-overlay"></div>
-                </div>
-                <div class="character-action-bar">
-                    <div class="active-dog-preview">
-                        <img id="active-dog-img" src="" alt="Perro Activo" class="active-dog-avatar">
-                        <div class="active-dog-fallback" id="active-dog-fallback-avatar">🐾</div>
-                        <div class="active-dog-info">
-                            <div class="active-dog-name" id="active-dog-name">Caniche</div>
-                            <div class="active-dog-skill" id="active-dog-skill-desc">Escaneo Lógico</div>
-                        </div>
-                    </div>
-                    <button class="btn-skill-trigger" id="btn-trigger-skill" onclick="window.gameEngine.triggerActiveSkill()">
-                        <div class="btn-skill-glow"></div>
-                        <span id="skill-btn-text">¡HABILIDAD!</span>
-                        <span class="skill-cooldown-overlay" id="skill-cooldown-overlay"></span>
-                    </button>
-                </div>
-            </div>
-            <div id="modal-help" class="modal-overlay">
-                <div class="modal-content">
-                    <h3>¿Cómo Jugar Mental Paws?</h3>
-                    <div class="help-scroll-area">
-                        <p><strong>🧠 Hemisferios en Acción:</strong></p>
-                        <p>Este juego ejercita tus dos hemisferios. El <strong>Izquierdo</strong> procesa lógica y texto. El <strong>Derecho</strong> procesa espacialidad y colores.</p>
-                        <hr>
-                        <p><strong>🎮 Los 3 Mini-Juegos:</strong></p>
-                        <ol>
-                            <li><strong>Slingshot Hemisférico:</strong> Arrastra el tirachinas y lanza huesos. Lee el color o el texto según indique la instrucción.</li>
-                            <li><strong>Conexión Neuronal:</strong> Une los puntos del mismo color. Llena toda la cuadrícula sin cruzar líneas.</li>
-                            <li><strong>Caída de Hueso:</strong> Toca bloques morados para romperlos. Guía el hueso al plato.</li>
-                        </ol>
-                        <hr>
-                        <p><strong>🐶 Perritos y Habilidades:</strong></p>
-                        <p>Cada perrito tiene una habilidad especial que se recarga con el tiempo.</p>
-                        <hr>
-                        <p><strong>🏆 Sistema de Logros:</strong></p>
-                        <p>Completa desafíos para desbloquear logros especiales.</p>
-                    </div>
-                    <button class="btn btn-primary" onclick="window.gameEngine.closeHelpModal()">Entendido</button>
-                </div>
-            </div>
-            <div id="modal-pause" class="modal-overlay">
-                <div class="modal-content">
-                    <h3>Juego Pausado</h3>
-                    <button class="btn btn-primary" onclick="window.gameEngine.resumeGame()">Continuar</button>
-                    <button class="btn btn-secondary" onclick="window.gameEngine.restartLevel()">Reiniciar Nivel</button>
-                    <button class="btn btn-secondary" onclick="window.gameEngine.exitToMenu()">Salir al Menú</button>
-                </div>
-            </div>
-            <div id="modal-victory" class="modal-overlay">
-                <div class="modal-content victory-content">
-                    <div class="victory-icon">🎉🐕</div>
-                    <h3 id="victory-title">¡Excelente Trabajo!</h3>
-                    <p id="victory-message">Has superado este desafío mental.</p>
-                    <div class="stats-summary">
-                        <div>Tiempo: <span id="victory-time-stat">0s</span></div>
-                        <div>Hemisferio ejercitado: <span id="victory-hemisphere-stat">Ambos</span></div>
-                    </div>
-                    <button class="btn btn-primary" id="btn-next-level" onclick="window.gameEngine.nextLevel()">Siguiente Nivel</button>
-                </div>
-            </div>
-            <div id="modal-defeat" class="modal-overlay">
-                <div class="modal-content defeat-content">
-                    <div class="defeat-icon">😢🐾</div>
-                    <h3>¡Casi lo logras!</h3>
-                    <p id="defeat-message">Tu cerebro se quedó sin energía en este intento.</p>
-                    <button class="btn btn-primary" onclick="window.gameEngine.restartLevel()">Reintentar</button>
-                    <button class="btn btn-secondary" onclick="window.gameEngine.skipLevel()">Brincar Nivel</button>
-                    <button class="btn btn-secondary" onclick="window.gameEngine.exitToMenu()">Salir al Menú</button>
-                </div>
-            </div>
-        </div>
+<div id="app">
+<div id="game-wrap">
+  <div class="top-bar">
+    <h1>📐 Mascota Matemática</h1>
+    <span><span class="star-count">⭐ <span id="totalStars">0</span></span><span style="cursor:pointer;margin-left:8px;font-size:18px;font-weight:800;color:var(--teal)" onclick="mostrarInstrucciones()" title="¿Cómo se juega?">❓</span></span>
+  </div>
+
+  <div class="pet-area">
+    <span class="pet-emoji" id="petEmoji">🐣</span>
+    <div class="pet-name" id="petName">Bebé Matemático</div>
+    <div class="pet-mood" id="petMood">Resolvé desafíos para cuidarme</div>
+  </div>
+
+  <div class="level-bar">
+    <span class="lv-label" id="lvLabel">Nivel 1</span>
+    <div class="lv-wrap"><div class="lv-fill" id="lvFill" style="width:0%"></div></div>
+    <span class="lv-xp" id="lvXp">0/80</span>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-item s-hambre"><span class="s-icon">🍖</span><div class="s-bar-wrap"><div class="s-bar" id="hambreBar" style="width:70%"></div></div><span class="s-val" id="hambreVal">70</span></div>
+    <div class="stat-item s-felicidad"><span class="s-icon">😊</span><div class="s-bar-wrap"><div class="s-bar" id="felizBar" style="width:60%"></div></div><span class="s-val" id="felizVal">60</span></div>
+    <div class="stat-item s-energia"><span class="s-icon">⚡</span><div class="s-bar-wrap"><div class="s-bar" id="energiaBar" style="width:80%"></div></div><span class="s-val" id="energiaVal">80</span></div>
+    <div class="stat-item s-salud"><span class="s-icon">❤️</span><div class="s-bar-wrap"><div class="s-bar" id="saludBar" style="width:90%"></div></div><span class="s-val" id="saludVal">90</span></div>
+  </div>
+
+  <div class="games-row">
+    <div class="game-btn" onclick="abrirJuego('calculo')">
+      <span class="g-icon">🧮</span>
+      <div class="g-title">Carrera</div>
+      <div class="g-reward">🍖 +Hambre</div>
     </div>
+    <div class="game-btn" onclick="abrirJuego('grid')">
+      <span class="g-icon">⊞</span>
+      <div class="g-title">Grid</div>
+      <div class="g-reward">😊 +Felicidad</div>
+    </div>
+    <div class="game-btn" onclick="abrirJuego('memoria')">
+      <span class="g-icon">⟳</span>
+      <div class="g-title">Memoria</div>
+      <div class="g-reward">⚡ +Energía</div>
+    </div>
+    <div class="game-btn" onclick="abrirJuego('ovejas')">
+      <span class="g-icon">🐑</span>
+      <div class="g-title">Ovejas</div>
+      <div class="g-reward">💤 +Sueño</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;font-size:10px;color:#5a4c38;margin-top:4px">Resolvé desafíos para cuidar a tu mascota · Evoluciona con estrellas ⭐</div>
+
+  <div id="toast"></div>
+  <div class="overlay" id="overlay">
+    <span class="close-x" onclick="cancelarJuego()">✕</span>
+    <div class="panel torn" id="panelContenido"></div>
+  </div>
+</div>
+</div>
+
 <script>
-// ===== AUDIO.JS =====
-// SINTETIZADOR DE EFECTOS DE SONIDO (WEB AUDIO API)
-// Totalmente autocontenido, no requiere de descargas externas de audio.
+// ===== PET =====
+let gameCancelled=false;
+const pet={hambre:70,felicidad:60,energia:80,salud:90,edad:0,estrellas:0,racha:0,_sleep:0,nivel:1,xp:0};
+const emojis=['🐣','🐤','🐔','🦅','🦉'];
+function xpMax(){return 80+(pet.nivel-1)*40}
+function calcularDif(){return Math.min(4,Math.floor((pet.nivel-1)/2))}
+function multiplicador(){return 1+(pet.nivel-1)*0.5}
+function obtenerEmoji(){
+  if(pet.salud<15)return '😷';
+  if(pet.energia<10)return '😴';
+  const idx=Math.min(4,Math.floor(pet.edad/20));
+  return emojis[idx];
+}
+function obtenerNombre(){
+  const nombres=['Bebé Matemático','Aprendiz de Números','Genio del Cálculo','Sabio Matemático','Mago Numérico'];
+  return nombres[Math.min(4,Math.floor(pet.edad/20))];
+}
+function actualizarMascota(){
+  document.getElementById('petEmoji').textContent=obtenerEmoji();
+  document.getElementById('petName').textContent=obtenerNombre();
+  document.getElementById('totalStars').textContent=pet.estrellas;
 
-class AudioController {
-    constructor() {
-        this.ctx = null;
-        this.isMuted = false;
-    }
+  const bars={hambre:pet.hambre,feliz:pet.felicidad,energia:pet.energia,salud:pet.salud};
+  for(const[k,v]of Object.entries(bars)){
+    document.getElementById(k+'Bar').style.width=Math.max(0,v)+'%';
+    document.getElementById(k+'Val').textContent=Math.round(Math.max(0,v));
+  }
 
-    init() {
-        if (this.ctx) return;
-        try {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            this.ctx = new AudioContext();
-        } catch (e) {
-            console.warn("Web Audio API no es soportada en este navegador.");
-        }
-    }
+  document.getElementById('lvLabel').textContent='Nivel '+pet.nivel;
+  document.getElementById('lvXp').textContent=pet.xp+'/'+xpMax();
+  document.getElementById('lvFill').style.width=Math.min(100,(pet.xp/xpMax())*100)+'%';
 
-    resume() {
-        if (this.ctx && this.ctx.state === 'suspended') {
-            this.ctx.resume();
-        }
-    }
-
-    createOscillator(type, freq, duration, gainStart = 0.1, gainEnd = 0.001) {
-        this.init();
-        this.resume();
-        if (this.isMuted || !this.ctx) return null;
-
-        const osc = this.ctx.createOscillator();
-        const gainNode = this.ctx.createGain();
-
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        
-        gainNode.gain.setValueAtTime(gainStart, this.ctx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(gainEnd, this.ctx.currentTime + duration);
-
-        osc.connect(gainNode);
-        gainNode.connect(this.ctx.destination);
-
-        return { osc, gainNode };
-    }
-
-    playClick() {
-        const synth = this.createOscillator('triangle', 600, 0.08, 0.15, 0.01);
-        if (!synth) return;
-        synth.osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.08);
-        synth.osc.start();
-        synth.osc.stop(this.ctx.currentTime + 0.08);
-    }
-
-    playLaunch() {
-        const synth = this.createOscillator('sawtooth', 120, 0.2, 0.2, 0.01);
-        if (!synth) return;
-        synth.osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.2);
-        synth.osc.start();
-        synth.osc.stop(this.ctx.currentTime + 0.2);
-    }
-
-    playPop() {
-        const synth = this.createOscillator('sine', 400, 0.15, 0.3, 0.01);
-        if (!synth) return;
-        synth.osc.frequency.setValueAtTime(300, this.ctx.currentTime);
-        synth.osc.frequency.exponentialRampToValueAtTime(900, this.ctx.currentTime + 0.12);
-        
-        // Agregar un oscilador secundario para ruido del pop
-        const noise = this.createOscillator('triangle', 80, 0.08, 0.2, 0.01);
-        if (noise) {
-            noise.osc.start();
-            noise.osc.stop(this.ctx.currentTime + 0.08);
-        }
-
-        synth.osc.start();
-        synth.osc.stop(this.ctx.currentTime + 0.15);
-    }
-
-    playConnect() {
-        const now = this.ctx ? this.ctx.currentTime : 0;
-        const synth1 = this.createOscillator('sine', 523.25, 0.15, 0.15, 0.01); // C5
-        if (!synth1) return;
-        synth1.osc.start();
-        synth1.osc.stop(now + 0.15);
-
-        setTimeout(() => {
-            const synth2 = this.createOscillator('sine', 659.25, 0.2, 0.15, 0.01); // E5
-            if (synth2) {
-                synth2.osc.start();
-                synth2.osc.stop(this.ctx.currentTime + 0.2);
-            }
-        }, 80);
-    }
-
-    playError() {
-        const synth = this.createOscillator('sawtooth', 130, 0.25, 0.2, 0.01);
-        if (!synth) return;
-        synth.osc.frequency.setValueAtTime(130, this.ctx.currentTime);
-        synth.osc.frequency.setValueAtTime(110, this.ctx.currentTime + 0.1);
-        synth.osc.start();
-        synth.osc.stop(this.ctx.currentTime + 0.25);
-    }
-
-    playSkill() {
-        this.init();
-        this.resume();
-        if (this.isMuted || !this.ctx) return;
-        
-        const now = this.ctx.currentTime;
-        const duration = 0.8;
-        
-        // Efecto ascendente mágico
-        const osc = this.ctx.createOscillator();
-        const gainNode = this.ctx.createGain();
-        
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(220, now);
-        osc.frequency.exponentialRampToValueAtTime(1760, now + duration);
-        
-        gainNode.gain.setValueAtTime(0.001, now);
-        gainNode.gain.linearRampToValueAtTime(0.2, now + 0.1);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
-        
-        osc.connect(gainNode);
-        gainNode.connect(this.ctx.destination);
-        
-        osc.start(now);
-        osc.stop(now + duration);
-
-        // Agitar un arpegio rápido secundario
-        for (let i = 0; i < 4; i++) {
-            setTimeout(() => {
-                const subOsc = this.createOscillator('triangle', 440 * (i + 1), 0.15, 0.08, 0.01);
-                if (subOsc) {
-                    subOsc.osc.start();
-                    subOsc.osc.stop(this.ctx.currentTime + 0.15);
-                }
-            }, i * 150);
-        }
-    }
-
-    playVictory() {
-        this.init();
-        this.resume();
-        if (this.isMuted || !this.ctx) return;
-        
-        const now = this.ctx.currentTime;
-        const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50]; // C4, E4, G4, C5, E5, G5, C6
-        
-        notes.forEach((freq, index) => {
-            setTimeout(() => {
-                const synth = this.createOscillator('sine', freq, 0.3, 0.12, 0.01);
-                if (synth) {
-                    synth.osc.start();
-                    synth.osc.stop(this.ctx.currentTime + 0.3);
-                }
-            }, index * 80);
-        });
-    }
-
-    playDefeat() {
-        this.init();
-        this.resume();
-        if (this.isMuted || !this.ctx) return;
-
-        const now = this.ctx.currentTime;
-        const notes = [293.66, 277.18, 261.63, 220.00]; // D4, C#4, C4, A3
-
-        notes.forEach((freq, index) => {
-            setTimeout(() => {
-                const synth = this.createOscillator('sawtooth', freq, 0.4, 0.15, 0.01);
-                if (synth) {
-                    synth.osc.start();
-                    synth.osc.stop(this.ctx.currentTime + 0.4);
-                }
-            }, index * 180);
-        });
-    }
-
-    playSlingshotStretch(dragDist) {
-        // Sonido de tensión continuo o de paso
-        const pitch = Math.min(100 + dragDist * 2, 400);
-        const synth = this.createOscillator('sine', pitch, 0.05, 0.03, 0.005);
-        if (synth) {
-            synth.osc.start();
-            synth.osc.stop(this.ctx.currentTime + 0.05);
-        }
-    }
+  let mood='😊 Feliz y saludable';
+  if(pet.hambre<20)mood='😫 Mucha hambre!';
+  else if(pet.felicidad<20)mood='😞 Triste... jugá conmigo';
+  else if(pet.energia<20)mood='😴 Muy cansado';
+  else if(pet.salud<25)mood='🤒 Me siento mal';
+  document.getElementById('petMood').textContent=mood;
 }
 
-// Exportar globalmente
-window.audio = new AudioController();
-
-</script>
-<script>
-// ===== SLINGSHOT.JS =====
-// MINI-JUEGO 1: STROOP SLINGSHOT (HEMISFERIO IZQ/DER - CONFLICTO COGNITIVO)
-
-class SlingshotGame {
-    constructor(canvas, difficulty) {
-        this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
-        this.difficulty = difficulty;
-        this.active = false;
-        this.animationId = null;
-
-        // Slingshot y Proyectil (Hueso)
-        this.slingshot = { x: 70, y: 320, radius: 20 };
-        this.bone = { x: 70, y: 320, radius: 10, rx: 0, ry: 0, isDragging: false, isFired: false, vx: 0, vy: 0 };
-        this.dragLimit = 60;
-
-        // Colores y Textos de Stroop
-        this.colorData = [
-            { name: 'ROJO', value: '#ff5400' },
-            { name: 'AZUL', value: '#00bbf9' },
-            { name: 'VERDE', value: '#39ff14' },
-            { name: 'AMARILLO', value: '#ffee32' },
-            { name: 'ROSA', value: '#ff007f' }
-        ];
-        
-        this.balloons = [];
-        this.targetInstruction = null; // { mode: 'color'|'word', color: colorDataObj }
-        this.scoreNeeded = difficulty === 'easy' ? 3 : (difficulty === 'medium' ? 4 : 5);
-        this.scoreCurrent = 0;
-        
-        // Habilidades
-        this.frozen = false;
-        this.freezeTimer = 0;
-        this.poodleHighlightActive = false;
-        this.poodleHighlightTimer = 0;
-    }
-
-    start() {
-        this.active = true;
-        this.scoreCurrent = 0;
-        
-        // Instrucción inicial
-        document.getElementById('game-instruction-text').innerText = "Cargando juego...";
-        this.generateInstruction();
-        this.spawnBalloons();
-
-        // Loop
-        this.gameLoop();
-    }
-
-    destroy() {
-        this.active = false;
-        if (this.animationId) cancelAnimationFrame(this.animationId);
-    }
-
-    spawnBalloons() {
-        this.balloons = [];
-        const count = this.difficulty === 'easy' ? 3 : (this.difficulty === 'medium' ? 4 : 5);
-        
-        // Determinar qué combinación de colores y textos se spawnearán
-        // Para asegurar que haya al menos una respuesta correcta
-        const correctBalloonIndex = Math.floor(Math.random() * count);
-
-        for (let i = 0; i < count; i++) {
-            const margin = 50;
-            const step = (this.canvas.width - margin * 2) / (count - 1 || 1);
-            const x = margin + i * step;
-            const y = this.canvas.height + Math.random() * 150 + 50;
-            
-            // Elegir datos Stroop
-            let textData, colorValueData;
-            
-            if (i === correctBalloonIndex) {
-                // Forzar que este globo sea el correcto
-                if (this.targetInstruction.mode === 'color') {
-                    // El color físico debe coincidir con el objetivo
-                    colorValueData = this.targetInstruction.color;
-                    // El texto escrito debe ser aleatorio diferente para que sea Stroop
-                    const filtered = this.colorData.filter(c => c.name !== colorValueData.name);
-                    textData = filtered[Math.floor(Math.random() * filtered.length)];
-                } else {
-                    // El texto escrito debe coincidir con el objetivo
-                    textData = this.targetInstruction.color;
-                    // El color físico debe ser aleatorio diferente
-                    const filtered = this.colorData.filter(c => c.name !== textData.name);
-                    colorValueData = filtered[Math.floor(Math.random() * filtered.length)];
-                }
-            } else {
-                // Hacer globos incorrectos aleatorios
-                textData = this.colorData[Math.floor(Math.random() * this.colorData.length)];
-                colorValueData = this.colorData[Math.floor(Math.random() * this.colorData.length)];
-                
-                // Asegurarse de que no califique como correcto por accidente
-                if (this.targetInstruction.mode === 'color') {
-                    while (colorValueData.name === this.targetInstruction.color.name) {
-                        colorValueData = this.colorData[Math.floor(Math.random() * this.colorData.length)];
-                    }
-                } else {
-                    while (textData.name === this.targetInstruction.color.name) {
-                        textData = this.colorData[Math.floor(Math.random() * this.colorData.length)];
-                    }
-                }
-            }
-
-            // Velocidades
-            let baseSpeed = this.difficulty === 'easy' ? 0.7 : (this.difficulty === 'medium' ? 1.1 : 1.6);
-            
-            this.balloons.push({
-                x: x,
-                y: y,
-                radius: 28,
-                text: textData.name,
-                colorValue: colorValueData.value,
-                colorName: colorValueData.name,
-                speedY: baseSpeed + Math.random() * 0.4,
-                wobbleSpeed: 0.02 + Math.random() * 0.02,
-                wobbleAmount: 4 + Math.random() * 6,
-                angle: Math.random() * Math.PI,
-                popped: false
-            });
-        }
-    }
-
-    generateInstruction() {
-        const targetColor = this.colorData[Math.floor(Math.random() * this.colorData.length)];
-        const mode = (this.difficulty === 'easy') ? 'color' : (Math.random() > 0.5 ? 'color' : 'word');
-        
-        this.targetInstruction = { mode, color: targetColor };
-        
-        // Poner texto en el panel
-        const instructionText = document.getElementById('game-instruction-text');
-        if (mode === 'color') {
-            instructionText.innerHTML = `¡Dispara al globo de <strong style="color: ${targetColor.value}">COLOR ${targetColor.name}</strong>!`;
-        } else {
-            instructionText.innerHTML = `¡Dispara al globo que <strong style="color: var(--secondary)">DICE "${targetColor.name}"</strong>!`;
-        }
-    }
-
-    // APLICAR HABILIDADES
-    applyPoodleSkill() {
-        // Caniche: Escaneo Lógico. Resalta el globo correcto temporalmente
-        this.poodleHighlightActive = true;
-        this.poodleHighlightTimer = 240; // ~4 segundos a 60fps
-    }
-
-    applyMalteseSkill() {
-        // Maltés: Enfoque Zen. Reduce la velocidad de todos los globos activos
-        this.balloons.forEach(b => b.speedY *= 0.4);
-    }
-
-    applyChihuahuaSkill() {
-        // Chihuahua: Ladrido Sonar. Revienta un globo incorrecto
-        const incorrects = this.balloons.filter(b => !b.popped && !this.checkIsCorrect(b));
-        if (incorrects.length > 0) {
-            const target = incorrects[Math.floor(Math.random() * incorrects.length)];
-            target.popped = true;
-            window.audio.playPop();
-            this.createExplosion(target.x, target.y, target.colorValue);
-        }
-    }
-
-    applyPugSkill() {
-        // Pug: Atrae los globos un poco hacia la izquierda
-        this.balloons.forEach(b => {
-            b.x = b.x * 0.4 + 100 * 0.6; // Mover hacia la trayectoria central
-        });
-    }
-
-    applyHuskySkill() {
-        // Husky: Gelo-congelación. Detiene los globos
-        this.frozen = true;
-        this.freezeTimer = 240; // 4 segundos a 60fps
-    }
-
-    applyShepherdSkill() {
-        // Pastor Alemán: Escudo. El escudo visual se activa en gameEngine, aquí solo renderizamos visual en el canvas si se desea
-    }
-
-    deactivateShieldVisual() {
-        // Callback si se rompe el escudo
-    }
-
-    checkIsCorrect(balloon) {
-        if (this.targetInstruction.mode === 'color') {
-            return balloon.colorName === this.targetInstruction.color.name;
-        } else {
-            return balloon.text === this.targetInstruction.color.name;
-        }
-    }
-
-    // LOGICA FÍSICA Y RENDERIZADO
-    update() {
-        // Enfriamiento de habilidades
-        if (this.poodleHighlightActive) {
-            this.poodleHighlightTimer--;
-            if (this.poodleHighlightTimer <= 0) this.poodleHighlightActive = false;
-        }
-
-        if (this.frozen) {
-            this.freezeTimer--;
-            if (this.freezeTimer <= 0) this.frozen = false;
-        }
-
-        // Movimiento de Proyectil
-        if (this.bone.isFired) {
-            let speedScale = 1;
-            // Enfoque Zen del Maltés ralentiza la velocidad del proyectil también para apuntado ultra-fino
-            if (window.gameEngine.skillActive && window.gameEngine.selectedDogId === 'maltese') {
-                speedScale = 0.4;
-            }
-
-            this.bone.x += this.bone.vx * speedScale;
-            this.bone.y += this.bone.vy * speedScale;
-            
-            // Gravedad simulada
-            this.bone.vy += 0.22 * speedScale;
-
-            // Colisiones con paredes o salida de pantalla
-            if (this.bone.x > this.canvas.width + 50 || this.bone.x < -50 || this.bone.y > this.canvas.height + 50) {
-                this.resetBone();
-            }
-
-            // Detección de colisiones con globos
-            for (let i = 0; i < this.balloons.length; i++) {
-                const b = this.balloons[i];
-                if (b.popped) continue;
-
-                const dx = this.bone.x - b.x;
-                const dy = this.bone.y - b.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist < this.bone.radius + b.radius) {
-                    b.popped = true;
-                    window.audio.playPop();
-                    this.createExplosion(b.x, b.y, b.colorValue);
-
-                    // Verificar acierto
-                    const isCorrect = this.checkIsCorrect(b);
-                    if (isCorrect) {
-                        this.scoreCurrent++;
-                        if (this.scoreCurrent >= this.scoreNeeded) {
-                            window.gameEngine.triggerVictory(3); // 3 Estrellas
-                            this.active = false;
-                        } else {
-                            window.gameEngine.showFeedbackText(`¡Acierto! ${this.scoreCurrent}/${this.scoreNeeded}`, "var(--secondary)");
-                            this.generateInstruction();
-                            setTimeout(() => this.spawnBalloons(), 600);
-                        }
-                    } else {
-                        window.gameEngine.handleMistake();
-                        setTimeout(() => this.spawnBalloons(), 600);
-                    }
-
-                    this.resetBone();
-                    break;
-                }
-            }
-        }
-
-        // Movimiento de Globos
-        let allPoppedOrEscaped = true;
-        this.balloons.forEach(b => {
-            if (!b.popped) {
-                // Si están congelados, no suben
-                if (!this.frozen) {
-                    let speedScale = 1;
-                    if (window.gameEngine.skillActive && window.gameEngine.selectedDogId === 'maltese') {
-                        speedScale = 0.4;
-                    }
-                    b.y -= b.speedY * speedScale;
-                }
-
-                // Balanceo horizontal
-                b.angle += b.wobbleSpeed;
-                b.currentX = b.x + Math.sin(b.angle) * b.wobbleAmount;
-
-                if (b.y > -b.radius) {
-                    allPoppedOrEscaped = false;
-                }
-            }
-        });
-
-        // Si se escaparon los globos y no acertamos, spawneamos nuevos globos (pero cuenta como error)
-        if (allPoppedOrEscaped && this.balloons.length > 0) {
-            window.gameEngine.handleMistake();
-            this.spawnBalloons();
-        }
-    }
-
-    resetBone() {
-        this.bone.x = this.slingshot.x;
-        this.bone.y = this.slingshot.y;
-        this.bone.vx = 0;
-        this.bone.vy = 0;
-        this.bone.isFired = false;
-        this.bone.isDragging = false;
-    }
-
-    draw() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Fondo del parque neon
-        this.ctx.fillStyle = '#0f0821';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Renderizar pasto / colina de fondo
-        this.ctx.fillStyle = '#170e30';
-        this.ctx.beginPath();
-        this.ctx.arc(this.canvas.width / 2, this.canvas.height + 150, 250, Math.PI, 0);
-        this.ctx.fill();
-
-        // RENDERIZAR GLOBOS
-        this.balloons.forEach(b => {
-            if (b.popped) return;
-
-            const cx = b.currentX || b.x;
-
-            // Hilo del globo
-            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-            this.ctx.lineWidth = 1;
-            this.ctx.beginPath();
-            this.ctx.moveTo(cx, b.y + b.radius);
-            this.ctx.quadraticCurveTo(cx - 10, b.y + b.radius + 30, cx, b.y + b.radius + 60);
-            this.ctx.stroke();
-
-            // Cuerpo del globo
-            this.ctx.fillStyle = b.colorValue;
-            
-            // Resplandor neón
-            this.ctx.shadowColor = b.colorValue;
-            this.ctx.shadowBlur = 10;
-            
-            this.ctx.beginPath();
-            this.ctx.arc(cx, b.y, b.radius, 0, Math.PI * 2);
-            this.ctx.fill();
-            
-            // Pequeño nudo en la base del globo
-            this.ctx.beginPath();
-            this.ctx.moveTo(cx, b.y + b.radius);
-            this.ctx.lineTo(cx - 4, b.y + b.radius + 6);
-            this.ctx.lineTo(cx + 4, b.y + b.radius + 6);
-            this.ctx.closePath();
-            this.ctx.fill();
-
-            // Resalte de Caniche (Logical Scan)
-            if (this.poodleHighlightActive && this.checkIsCorrect(b)) {
-                this.ctx.strokeStyle = '#39ff14';
-                this.ctx.lineWidth = 4;
-                this.ctx.shadowColor = '#39ff14';
-                this.ctx.shadowBlur = 15;
-                this.ctx.beginPath();
-                this.ctx.arc(cx, b.y, b.radius + 4, 0, Math.PI * 2);
-                this.ctx.stroke();
-            }
-
-            // Reseteo de sombras
-            this.ctx.shadowBlur = 0;
-
-            // Brillo 3D del globo
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-            this.ctx.beginPath();
-            this.ctx.arc(cx - b.radius * 0.3, b.y - b.radius * 0.3, b.radius * 0.2, 0, Math.PI * 2);
-            this.ctx.fill();
-
-            // Texto de color escrito
-            this.ctx.fillStyle = '#07030d';
-            this.ctx.font = 'bold 10px Inter';
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'middle';
-            this.ctx.fillText(b.text, cx, b.y);
-        });
-
-        // RENDERIZAR TIRACHINAS (SLINGSHOT)
-        this.ctx.strokeStyle = '#4a2574';
-        this.ctx.lineWidth = 6;
-        this.ctx.beginPath();
-        // Poste izquierdo del tirachinas
-        this.ctx.moveTo(this.slingshot.x - 20, this.slingshot.y);
-        this.ctx.lineTo(this.slingshot.x - 20, this.slingshot.y + 40);
-        // Poste derecho
-        this.ctx.moveTo(this.slingshot.x + 20, this.slingshot.y);
-        this.ctx.lineTo(this.slingshot.x + 20, this.slingshot.y + 40);
-        // Mango principal
-        this.ctx.moveTo(this.slingshot.x, this.slingshot.y + 25);
-        this.ctx.lineTo(this.slingshot.x, this.slingshot.y + 70);
-        this.ctx.stroke();
-
-        // Gomas del resorte (si estamos arrastrando)
-        if (this.bone.isDragging || !this.bone.isFired) {
-            this.ctx.strokeStyle = '#ff7b00';
-            this.ctx.lineWidth = 3;
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.slingshot.x - 18, this.slingshot.y + 5);
-            this.ctx.lineTo(this.bone.x, this.bone.y);
-            this.ctx.lineTo(this.slingshot.x + 18, this.slingshot.y + 5);
-            this.ctx.stroke();
-        }
-
-        // RENDERIZAR PROYECTIL (Hueso)
-        if (!this.bone.isFired || this.bone.isDragging) {
-            // Hueso dibujado
-            this.ctx.fillStyle = '#f3f0f7';
-            this.ctx.shadowBlur = 8;
-            this.ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
-            
-            this.drawBone(this.bone.x, this.bone.y, this.bone.radius);
-            
-            this.ctx.shadowBlur = 0;
-        } else {
-            // Hueso volando con estela
-            this.ctx.fillStyle = 'rgba(243, 240, 247, 0.3)';
-            this.drawBone(this.bone.x - this.bone.vx * 1.5, this.bone.y - this.bone.vy * 1.5, this.bone.radius * 0.8);
-            
-            this.ctx.fillStyle = '#f3f0f7';
-            this.ctx.shadowBlur = 8;
-            this.ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
-            this.drawBone(this.bone.x, this.bone.y, this.bone.radius);
-            this.ctx.shadowBlur = 0;
-        }
-
-        // Dibujar indicador de Escudo del Pastor Alemán
-        if (window.gameEngine.shieldActive) {
-            this.ctx.strokeStyle = 'rgba(0, 245, 212, 0.6)';
-            this.ctx.lineWidth = 2;
-            this.ctx.setLineDash([4, 4]);
-            this.ctx.shadowBlur = 10;
-            this.ctx.shadowColor = 'var(--secondary)';
-            this.ctx.beginPath();
-            this.ctx.arc(this.slingshot.x, this.slingshot.y + 20, 50, 0, Math.PI * 2);
-            this.ctx.stroke();
-            this.ctx.setLineDash([]);
-            this.ctx.shadowBlur = 0;
-        }
-
-        // Renderizar congelación Husky
-        if (this.frozen) {
-            this.ctx.fillStyle = 'rgba(0, 245, 212, 0.1)';
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.strokeStyle = '#00f5d4';
-            this.ctx.lineWidth = 3;
-            this.ctx.strokeRect(3, 3, this.canvas.width - 6, this.canvas.height - 6);
-        }
-        
-        // Renderizar partículas
-        this.updateAndDrawParticles();
-    }
-
-    drawBone(x, y, r) {
-        this.ctx.save();
-        this.ctx.translate(x, y);
-        
-        // Rotar el hueso si está volando
-        if (this.bone.isFired) {
-            const angle = Math.atan2(this.bone.vy, this.bone.vx);
-            this.ctx.rotate(angle);
-        }
-        
-        // Cuerpo
-        this.ctx.fillRect(-r, -r/3, r * 2, r * 0.7);
-        // Cabezas redondeadas del hueso
-        this.ctx.beginPath();
-        this.ctx.arc(-r, -r/3, r/2, 0, Math.PI * 2);
-        this.ctx.arc(-r, r/3, r/2, 0, Math.PI * 2);
-        this.ctx.arc(r, -r/3, r/2, 0, Math.PI * 2);
-        this.ctx.arc(r, r/3, r/2, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        this.ctx.restore();
-    }
-
-    gameLoop() {
-        if (!this.active) return;
-        this.update();
-        this.draw();
-        this.animationId = requestAnimationFrame(() => this.gameLoop());
-    }
-
-    // MANEJO DE ENTRADAS MOUSE / TOUCH
-    handleInputStart(x, y) {
-        if (this.bone.isFired) return;
-
-        // Verificar si el toque está cerca del proyectil
-        const dx = x - this.bone.x;
-        const dy = y - this.bone.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < 30) {
-            this.bone.isDragging = true;
-        }
-    }
-
-    handleInputMove(x, y) {
-        if (!this.bone.isDragging) return;
-
-        // Calcular desplazamiento desde el centro del tirachinas
-        let dx = x - this.slingshot.x;
-        let dy = y - this.slingshot.y;
-        let dist = Math.sqrt(dx * dx + dy * dy);
-
-        // Limitar la distancia máxima de estiramiento
-        if (dist > this.dragLimit) {
-            const ratio = this.dragLimit / dist;
-            dx *= ratio;
-            dy *= ratio;
-        }
-
-        this.bone.x = this.slingshot.x + dx;
-        this.bone.y = this.slingshot.y + dy;
-
-        // Emitir un leve tic sonoro al arrastrar
-        if (Math.random() > 0.85) {
-            window.audio.playSlingshotStretch(dist);
-        }
-    }
-
-    handleInputEnd() {
-        if (!this.bone.isDragging) return;
-
-        this.bone.isDragging = false;
-
-        // Calcular vector de lanzamiento
-        const dx = this.slingshot.x - this.bone.x;
-        const dy = this.slingshot.y - this.bone.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist > 15) {
-            // Lanzar
-            this.bone.isFired = true;
-            this.bone.vx = dx * 0.17; // Fuerza de impulso
-            this.bone.vy = dy * 0.17;
-            window.audio.playLaunch();
-        } else {
-            // Cancelar y resetear
-            this.resetBone();
-        }
-    }
-
-    // SISTEMA DE PARTÍCULAS (Explosiones)
-    particles = [];
-    
-    createExplosion(x, y, color) {
-        for (let i = 0; i < 15; i++) {
-            this.particles.push({
-                x: x,
-                y: y,
-                vx: (Math.random() - 0.5) * 8,
-                vy: (Math.random() - 0.5) * 8,
-                radius: 2 + Math.random() * 3,
-                color: color,
-                alpha: 1,
-                life: 30 + Math.random() * 20
-            });
-        }
-    }
-
-    updateAndDrawParticles() {
-        for (let i = this.particles.length - 1; i >= 0; i--) {
-            const p = this.particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.1; // caída de gravedad
-            p.alpha -= 1 / p.life;
-
-            if (p.alpha <= 0) {
-                this.particles.splice(i, 1);
-                continue;
-            }
-
-            this.ctx.fillStyle = p.color;
-            this.ctx.globalAlpha = p.alpha;
-            this.ctx.beginPath();
-            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-            this.ctx.fill();
-        }
-        this.ctx.globalAlpha = 1.0;
-    }
+function ganarXP(cant){
+  pet.xp+=cant;
+  while(pet.xp>=xpMax()){
+    pet.xp-=xpMax();
+    pet.nivel++;
+    const d=calcularDif();
+    toast('⬆️ ¡Nivel '+pet.nivel+'! Dificultad '+(d+1));
+  }
+  actualizarMascota();
 }
 
-</script>
-<script>
-// ===== FLOW.JS =====
-// MINI-JUEGO 2: CONEXIONES SINÁPTICAS (HEMISFERIO IZQ - LÓGICO / DER - ESPACIAL)
+// Decaimiento cada 4 segundos
+setInterval(()=>{
+  if(pet._sleep>0){pet._sleep-=.25;return} // durmiendo, no decae
+  pet.hambre=Math.max(0,pet.hambre-.8);
+  pet.felicidad=Math.max(0,pet.felicidad-.4);
+  pet.energia=Math.max(0,pet.energia-.3);
+  pet.salud=Math.max(0,pet.salud-.15);
+  pet.edad+=.03;
+  if(pet.hambre<5||pet.salud<10)pet.salud=Math.max(0,pet.salud-1);
+  if(pet.estrellas>pet.edad*3)pet.edad+=.1; // evoluciona más rápido si gana estrellas
+  actualizarMascota();
+},4000);
 
-class FlowGame {
-    constructor(canvas, difficulty) {
-        this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
-        this.difficulty = difficulty;
-        this.active = false;
-
-        // Tamaño de la cuadrícula
-        this.gridSize = difficulty === 'easy' ? 4 : (difficulty === 'medium' ? 5 : 6);
-        this.cellSize = 0;
-        this.gridOffset = { x: 0, y: 0 };
-
-        // Definición del nivel
-        this.colors = {
-            red: '#ff5400',
-            blue: '#00bbf9',
-            green: '#39ff14',
-            yellow: '#ffee32',
-            orange: '#ff007f',
-            purple: '#b5179e'
-        };
-
-        this.pairs = [];
-        this.paths = {}; // { colorId: [{x, y}, {x, y}] }
-        this.activeColor = null;
-        this.currentDrawingPath = [];
-
-        this.poodleHintActive = false;
-        this.poodleHintPath = [];
-        this.sonarActive = false;
-        this.sonarTimer = 0;
-    }
-
-    start() {
-        this.active = true;
-        this.cellSize = Math.floor(Math.min(this.canvas.width - 40, this.canvas.height - 40) / this.gridSize);
-        this.gridOffset.x = Math.floor((this.canvas.width - this.cellSize * this.gridSize) / 2);
-        this.gridOffset.y = Math.floor((this.canvas.height - this.cellSize * this.gridSize) / 2);
-
-        document.getElementById('game-instruction-text').innerText = 
-            "Conecta los cerebros/juguetes del mismo color. ¡Llena toda la cuadrícula sin cruzar las líneas!";
-        
-        this.loadLevel();
-        this.draw();
-    }
-
-    destroy() {
-        this.active = false;
-    }
-
-    loadLevel() {
-        this.paths = {};
-        this.activeColor = null;
-        this.currentDrawingPath = [];
-
-        if (this.gridSize === 4) {
-            // 4x4 - Easy
-            this.pairs = [
-                { id: 'red', color: this.colors.red, p1: {x: 0, y: 0}, p2: {x: 2, y: 2} },
-                { id: 'blue', color: this.colors.blue, p1: {x: 1, y: 0}, p2: {x: 3, y: 0} },
-                { id: 'green', color: this.colors.green, p1: {x: 0, y: 3}, p2: {x: 3, y: 3} },
-                { id: 'yellow', color: this.colors.yellow, p1: {x: 1, y: 1}, p2: {x: 3, y: 2} }
-            ];
-        } else if (this.gridSize === 5) {
-            // 5x5 - Medium
-            // La configuración original dejaba el tablero matemáticamente irresoluble
-            // (verificado con un solver exhaustivo tipo Numberlink). Esta sí tiene solución
-            // completa y fue verificada de la misma forma.
-            this.pairs = [
-                { id: 'red', color: this.colors.red, p1: {x: 3, y: 0}, p2: {x: 0, y: 0} },
-                { id: 'green', color: this.colors.green, p1: {x: 2, y: 4}, p2: {x: 1, y: 1} },
-                { id: 'orange', color: this.colors.orange, p1: {x: 2, y: 3}, p2: {x: 4, y: 4} },
-                { id: 'yellow', color: this.colors.yellow, p1: {x: 2, y: 2}, p2: {x: 4, y: 3} },
-                { id: 'blue', color: this.colors.blue, p1: {x: 0, y: 1}, p2: {x: 0, y: 4} }
-            ];
-        } else {
-            // 6x6 - Hard
-            // Misma corrección que en 5x5: la configuración original era irresoluble.
-            this.pairs = [
-                { id: 'red', color: this.colors.red, p1: {x: 3, y: 1}, p2: {x: 1, y: 4} },
-                { id: 'blue', color: this.colors.blue, p1: {x: 5, y: 4}, p2: {x: 2, y: 0} },
-                { id: 'green', color: this.colors.green, p1: {x: 3, y: 4}, p2: {x: 5, y: 5} },
-                { id: 'yellow', color: this.colors.yellow, p1: {x: 1, y: 0}, p2: {x: 0, y: 2} },
-                { id: 'orange', color: this.colors.orange, p1: {x: 2, y: 2}, p2: {x: 2, y: 5} },
-                { id: 'purple', color: this.colors.purple, p1: {x: 4, y: 1}, p2: {x: 3, y: 3} }
-            ];
-        }
-
-        // Inicializar rutas vacías
-        this.pairs.forEach(pair => {
-            this.paths[pair.id] = [];
-        });
-    }
-
-    // HABILIDADES
-    applyPoodleSkill() {
-        // Caniche: Escaneo Lógico. Muestra los primeros 3 pasos de la conexión Roja
-        this.poodleHintActive = true;
-        
-        if (this.gridSize === 4) {
-            this.poodleHintPath = [{x: 0, y: 0}, {x: 0, y: 1}, {x: 0, y: 2}, {x: 1, y: 2}, {x: 2, y: 2}];
-        } else if (this.gridSize === 5) {
-            this.poodleHintPath = [{x: 3, y: 0}, {x: 4, y: 0}, {x: 4, y: 1}];
-        } else {
-            this.poodleHintPath = [{x: 3, y: 1}, {x: 2, y: 1}, {x: 1, y: 1}];
-        }
-        
-        this.draw();
-        
-        setTimeout(() => {
-            this.poodleHintActive = false;
-            this.draw();
-        }, 5000); // Ocultar después de 5 segundos
-    }
-
-    applyMalteseSkill() {
-        // Manejado en el gameEngine (tiempo extendido)
-    }
-
-    applyChihuahuaSkill() {
-        // Chihuahua: Ladrido Sonar. Parpadea los endpoints
-        this.sonarActive = true;
-        this.sonarTimer = 8; // 8 ciclos de parpadeo
-        this.runSonarEffect();
-    }
-
-    runSonarEffect() {
-        if (!this.active || !this.sonarActive) return;
-        this.draw();
-        this.sonarTimer--;
-        if (this.sonarTimer <= 0) {
-            this.sonarActive = false;
-            this.draw();
-        } else {
-            setTimeout(() => this.runSonarEffect(), 250);
-        }
-    }
-
-    applyPugSkill() {
-        // Pug: Limpia líneas rotas o incompletas para reiniciar el tablero limpiamente
-        this.pairs.forEach(pair => {
-            const path = this.paths[pair.id];
-            if (path.length > 0) {
-                // Si no está conectada la línea con ambos extremos
-                const isConnected = this.checkPathIsComplete(pair);
-                if (!isConnected) {
-                    this.paths[pair.id] = [];
-                }
-            }
-        });
-        window.audio.playConnect();
-        this.draw();
-    }
-
-    applyHuskySkill() {
-        // Husky congelación. Detiene el reloj del juego principal (durante 4 segundos)
-        window.gameEngine.showFeedbackText("⏰ ¡RELOJ CONGELADO POR HUSKY!", "#00f5d4");
-    }
-
-    applyShepherdSkill() {
-        // Escudo protector visual.
-    }
-
-    deactivateShieldVisual() {}
-
-    checkPathIsComplete(pair) {
-        const path = this.paths[pair.id];
-        if (path.length < 2) return false;
-        const start = path[0];
-        const end = path[path.length - 1];
-        
-        const matchesP1P2 = (this.isEqual(start, pair.p1) && this.isEqual(end, pair.p2)) || 
-                            (this.isEqual(start, pair.p2) && this.isEqual(end, pair.p1));
-        return matchesP1P2;
-    }
-
-    // MANEJO DE ENTRADAS DE DIBUJO
-    getGridCoords(x, y) {
-        const gx = Math.floor((x - this.gridOffset.x) / this.cellSize);
-        const gy = Math.floor((y - this.gridOffset.y) / this.cellSize);
-        
-        if (gx >= 0 && gx < this.gridSize && gy >= 0 && gy < this.gridSize) {
-            return { x: gx, y: gy };
-        }
-        return null;
-    }
-
-    handleInputStart(x, y) {
-        const coords = this.getGridCoords(x, y);
-        if (!coords) return;
-
-        // Buscar si tocamos un punto de inicio/fin de alguna de las parejas
-        const pair = this.pairs.find(p => this.isEqual(p.p1, coords) || this.isEqual(p.p2, coords));
-        
-        if (pair) {
-            // Empezar a dibujar
-            this.activeColor = pair.id;
-            this.paths[pair.id] = [coords];
-            window.audio.playClick();
-            this.draw();
-        } else {
-            // Si tocamos una línea existente, podemos empezar a dibujar desde allí
-            for (let pairId in this.paths) {
-                const path = this.paths[pairId];
-                const index = path.findIndex(p => this.isEqual(p, coords));
-                if (index !== -1) {
-                    this.activeColor = pairId;
-                    this.paths[pairId] = path.slice(0, index + 1); // Recortar
-                    window.audio.playClick();
-                    this.draw();
-                    break;
-                }
-            }
-        }
-    }
-
-    handleInputMove(x, y) {
-        if (!this.activeColor) return;
-        const coords = this.getGridCoords(x, y);
-        if (!coords) return;
-
-        const path = this.paths[this.activeColor];
-        const last = path[path.length - 1];
-
-        // Solo permitir movimiento a celdas adyacentes (no diagonales)
-        const dx = Math.abs(coords.x - last.x);
-        const dy = Math.abs(coords.y - last.y);
-        const isNeighbor = (dx === 1 && dy === 0) || (dx === 0 && dy === 1);
-
-        if (!isNeighbor) return;
-
-        // Comprobar si volvemos sobre el paso anterior (retroceder)
-        if (path.length > 1 && this.isEqual(path[path.length - 2], coords)) {
-            path.pop();
-            this.draw();
-            return;
-        }
-
-        // Comprobar si colisiona con el punto final de OTRA pareja
-        const otherPairPoint = this.pairs.find(p => 
-            p.id !== this.activeColor && (this.isEqual(p.p1, coords) || this.isEqual(p.p2, coords))
-        );
-        if (otherPairPoint) return; // Bloquear paso por encima de cabezas de otros colores
-
-        // Comprobar si colisiona con la cabeza del MISMO color (punto final)
-        const pair = this.pairs.find(p => p.id === this.activeColor);
-        const isEndpoint = this.isEqual(pair.p1, coords) || this.isEqual(pair.p2, coords);
-
-        // Si ya llegamos al extremo opuesto, completamos la línea
-        const startPoint = path[0];
-        const isSelfEndpoint = isEndpoint && !this.isEqual(startPoint, coords);
-
-        // Romper otras líneas si pasamos sobre ellas (Sobrescribir)
-        for (let pairId in this.paths) {
-            if (pairId === this.activeColor) continue;
-            
-            const otherPath = this.paths[pairId];
-            const collisionIndex = otherPath.findIndex(p => this.isEqual(p, coords));
-            
-            if (collisionIndex !== -1) {
-                // Cortar la otra línea en el punto de colisión
-                this.paths[pairId] = otherPath.slice(0, collisionIndex);
-            }
-        }
-
-        // Verificar si la celda ya está en nuestra propia línea (evitar bucles)
-        const alreadyInSelfPath = path.some(p => this.isEqual(p, coords));
-        if (alreadyInSelfPath && !isSelfEndpoint) return;
-
-        // Agregar punto
-        path.push(coords);
-        
-        // Efecto de sonido si completamos la conexión
-        if (isSelfEndpoint) {
-            window.audio.playConnect();
-            this.activeColor = null; // Dejar de dibujar
-            this.checkVictoryCondition();
-        } else {
-            if (Math.random() > 0.6) window.audio.playClick();
-        }
-
-        this.draw();
-    }
-
-    handleInputEnd() {
-        this.activeColor = null;
-        this.draw();
-    }
-
-    checkVictoryCondition() {
-        // 1. Todas las parejas deben estar conectadas
-        let allConnected = true;
-        this.pairs.forEach(pair => {
-            if (!this.checkPathIsComplete(pair)) {
-                allConnected = false;
-            }
-        });
-
-        if (!allConnected) return;
-
-        // 2. Toda la cuadrícula debe estar llena
-        // Contar celdas ocupadas
-        const occupied = new Set();
-        for (let pairId in this.paths) {
-            this.paths[pairId].forEach(pt => {
-                occupied.add(`${pt.x},${pt.y}`);
-            });
-        }
-
-        const totalCells = this.gridSize * this.gridSize;
-        
-        if (occupied.size === totalCells) {
-            // ¡Ganó!
-            window.gameEngine.triggerVictory(3); // 3 Estrellas
-            this.active = false;
-        } else {
-            // Notificar que falta llenar el tablero
-            window.gameEngine.showFeedbackText("¡Conectados! Ahora llena toda la cuadrícula.", "var(--yellow)");
-        }
-    }
-
-    isEqual(p1, p2) {
-        return p1.x === p2.x && p1.y === p2.y;
-    }
-
-    // DIBUJADO DE LA ESCENA
-    draw() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Fondo oscuro neón
-        this.ctx.fillStyle = '#0f0821';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // DIBUJAR CUADRÍCULA
-        this.ctx.strokeStyle = '#1e1136';
-        this.ctx.lineWidth = 2;
-        
-        for (let i = 0; i <= this.gridSize; i++) {
-            // Líneas verticales
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.gridOffset.x + i * this.cellSize, this.gridOffset.y);
-            this.ctx.lineTo(this.gridOffset.x + i * this.cellSize, this.gridOffset.y + this.gridSize * this.cellSize);
-            this.ctx.stroke();
-
-            // Líneas horizontales
-            this.ctx.beginPath();
-            this.ctx.moveTo(this.gridOffset.x, this.gridOffset.y + i * this.cellSize);
-            this.ctx.lineTo(this.gridOffset.x + this.gridSize * this.cellSize, this.gridOffset.y + i * this.cellSize);
-            this.ctx.stroke();
-        }
-
-        // DIBUJAR PISTAS (Caniche - Poodle Scan)
-        if (this.poodleHintActive && this.poodleHintPath.length > 0) {
-            this.ctx.strokeStyle = 'rgba(57, 255, 20, 0.3)';
-            this.ctx.lineWidth = this.cellSize * 0.45;
-            this.ctx.lineCap = 'round';
-            this.ctx.lineJoin = 'round';
-            
-            this.ctx.beginPath();
-            this.poodleHintPath.forEach((pt, idx) => {
-                const cx = this.gridOffset.x + pt.x * this.cellSize + this.cellSize / 2;
-                const cy = this.gridOffset.y + pt.y * this.cellSize + this.cellSize / 2;
-                if (idx === 0) this.ctx.moveTo(cx, cy);
-                else this.ctx.lineTo(cx, cy);
-            });
-            this.ctx.stroke();
-        }
-
-        // DIBUJAR CAMINOS DIBUJADOS (LINEAS)
-        for (let pairId in this.paths) {
-            const path = this.paths[pairId];
-            if (path.length < 2) continue;
-
-            const pair = this.pairs.find(p => p.id === pairId);
-            this.ctx.strokeStyle = pair.color;
-            this.ctx.lineWidth = this.cellSize * 0.28;
-            this.ctx.lineCap = 'round';
-            this.ctx.lineJoin = 'round';
-
-            // Glow neón en los cables
-            this.ctx.shadowColor = pair.color;
-            this.ctx.shadowBlur = 12;
-
-            this.ctx.beginPath();
-            path.forEach((pt, index) => {
-                const cx = this.gridOffset.x + pt.x * this.cellSize + this.cellSize / 2;
-                const cy = this.gridOffset.y + pt.y * this.cellSize + this.cellSize / 2;
-                
-                if (index === 0) this.ctx.moveTo(cx, cy);
-                else this.ctx.lineTo(cx, cy);
-            });
-            this.ctx.stroke();
-            this.ctx.shadowBlur = 0; // Reset
-        }
-
-        // DIBUJAR PUNTOS EXTREMOS (NEURONAS / CEREBRITOS)
-        this.pairs.forEach(pair => {
-            const drawNode = (pt) => {
-                const cx = this.gridOffset.x + pt.x * this.cellSize + this.cellSize / 2;
-                const cy = this.gridOffset.y + pt.y * this.cellSize + this.cellSize / 2;
-                const r = this.cellSize * 0.3;
-
-                // Anillo de brillo
-                this.ctx.fillStyle = pair.color;
-                
-                let blur = 6;
-                // Si la habilidad sonar está activa, parpadear
-                if (this.sonarActive) {
-                    blur = (this.sonarTimer % 2 === 0) ? 22 : 2;
-                }
-                
-                this.ctx.shadowColor = pair.color;
-                this.ctx.shadowBlur = blur;
-
-                this.ctx.beginPath();
-                this.ctx.arc(cx, cy, r, 0, Math.PI * 2);
-                this.ctx.fill();
-                this.ctx.shadowBlur = 0; // Reset
-
-                // Centro / Núcleo
-                this.ctx.fillStyle = '#ffffff';
-                this.ctx.beginPath();
-                this.ctx.arc(cx, cy, r * 0.4, 0, Math.PI * 2);
-                this.ctx.fill();
-
-                // Detalles táctiles - Emoji neurona o huella miniatura
-                this.ctx.fillStyle = '#07030d';
-                this.ctx.font = `bold ${Math.floor(this.cellSize * 0.28)}px Inter`;
-                this.ctx.textAlign = 'center';
-                this.ctx.textBaseline = 'middle';
-                this.ctx.fillText("🧠", cx, cy);
-            };
-
-            drawNode(pair.p1);
-            drawNode(pair.p2);
-        });
-
-        // Congelación visual Husky
-        if (window.gameEngine.skillActive && window.gameEngine.selectedDogId === 'husky') {
-            this.ctx.fillStyle = 'rgba(0, 245, 212, 0.08)';
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        }
-    }
+function toast(m){
+  const e=document.getElementById('toast');
+  e.textContent=m;e.style.opacity=1;
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>e.style.opacity=0,1800);
 }
 
-</script>
-<script>
-// ===== GRAVITY.JS =====
-// MINI-JUEGO 3: CAÍDA DE HUESO (HEMISFERIO DER - INTUICIÓN FÍSICA / IZQ - PLANIFICACIÓN)
-
-class GravityGame {
-    constructor(canvas, difficulty) {
-        this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
-        this.difficulty = difficulty;
-        this.active = false;
-        this.animationId = null;
-
-        // Propiedades de la Física
-        this.gravity = 0.28;
-        this.restitution = 0.42; // Rebote
-        this.friction = 0.98; // Rozamiento
-
-        // Hueso (Proyectil Físico)
-        this.bone = { x: 50, y: 40, vx: 0.8, vy: 0, radius: 11, mass: 1, stuckTimer: 0 };
-
-        // Objetivo (Tazón del Perrito)
-        this.bowl = { x: 305, y: 375, radius: 24 };
-
-        // Lista de bloques
-        this.blocks = [];
-        
-        // Habilidades
-        this.predictTrajectory = false;
-        this.highlightFirstBlock = false;
-        this.huskyFrozen = false;
-        this.huskyFreezeTimer = 0;
-    }
-
-    start() {
-        this.active = true;
-        this.bone.stuckTimer = 0;
-        
-        document.getElementById('game-instruction-text').innerText = 
-            "¡Toca los bloques de madera morados para destruirlos y guiar el hueso hacia el plato azul!";
-        
-        this.setupLevel();
-        this.gameLoop();
-    }
-
-    destroy() {
-        this.active = false;
-        if (this.animationId) cancelAnimationFrame(this.animationId);
-    }
-
-    setupLevel() {
-        this.blocks = [];
-        this.bone.vy = 0;
-        this.huskyFrozen = false;
-
-        if (this.difficulty === 'easy') {
-            // Nivel 3: Fácil
-            this.bone.x = 60;
-            this.bone.y = 40;
-            // vx=0.8 se frenaba por completo sobre la primera rampa (fricción) y el hueso
-            // quedaba atascado ahí para siempre; con 1.8 sí llega a romper b1 y avanzar.
-            this.bone.vx = 1.8;
-            // Empuje al liberar un bloque rompible (ver handleInputStart): valores
-            // verificados por simulación para que llegue al plato desde cualquier
-            // posición de reposo, no solo si se rompe en el primer medio segundo.
-            this.boneKickVx = 1.8;
-            this.boneKickVy = -0.5;
-            
-            this.blocks = [
-                // Rampa estática arriba
-                { x: 30, y: 100, w: 120, h: 18, type: 'static', color: '#4a2574' },
-                // Bloque rompible 1 que retiene el hueso
-                { x: 140, y: 90, w: 40, h: 40, type: 'break', color: '#ff007f', id: 'b1' },
-                // Bloque rompible 2 abajo para encarrilar al tazón
-                { x: 190, y: 220, w: 50, h: 50, type: 'break', color: '#ff007f', id: 'b2' },
-                // Rampa estática abajo
-                { x: 150, y: 270, w: 140, h: 18, type: 'static', color: '#4a2574' }
-            ];
-        } else if (this.difficulty === 'medium') {
-            // Nivel 6: Medio
-            this.bone.x = 50;
-            this.bone.y = 40;
-            // Mismo ajuste que en el nivel 3: con 0.8 el hueso se atascaba en la rampa inicial.
-            this.bone.vx = 1.8;
-            this.boneKickVx = 1.8;
-            this.boneKickVy = -0.5;
-            
-            this.blocks = [
-                { x: 20, y: 90, w: 100, h: 15, type: 'static', color: '#4a2574' },
-                // Bloques rompibles
-                { x: 110, y: 80, w: 35, h: 35, type: 'break', color: '#ff007f', id: 'b1' },
-                { x: 150, y: 160, w: 60, h: 25, type: 'break', color: '#ff007f', id: 'b2' },
-                // Barrera deslizante de hielo (Husky puede congelar)
-                { x: 180, y: 240, w: 70, h: 15, type: 'slide', color: '#00f5d4', vx: 1.5, dir: 1, leftLimit: 120, rightLimit: 260 },
-                { x: 80, y: 310, w: 140, h: 15, type: 'static', color: '#4a2574' },
-                { x: 220, y: 280, w: 30, h: 45, type: 'break', color: '#ff007f', id: 'b3' }
-            ];
-        } else {
-            // Nivel 9: Difícil
-            this.bone.x = 60;
-            this.bone.y = 40;
-            this.bone.vx = 0.8;
-            // El nivel difícil necesita un empuje más suave porque tiene más obstáculos
-            // encadenados; un empuje igual al de fácil/medio lo desvía hacia los bordes.
-            this.boneKickVx = 1.5;
-            this.boneKickVy = -0.3;
-            
-            this.blocks = [
-                { x: 30, y: 90, w: 80, h: 15, type: 'static', color: '#4a2574' },
-                { x: 110, y: 80, w: 35, h: 35, type: 'break', color: '#ff007f', id: 'b1' },
-                
-                // Obstáculo móvil rápido arriba
-                { x: 140, y: 160, w: 60, h: 15, type: 'slide', color: '#00f5d4', vx: 2.2, dir: -1, leftLimit: 80, rightLimit: 240 },
-                { x: 210, y: 150, w: 35, h: 35, type: 'break', color: '#ff007f', id: 'b2' },
-                
-                // Trampa con rampas cruzadas
-                { x: 50, y: 230, w: 130, h: 15, type: 'static', color: '#4a2574' },
-                { x: 170, y: 210, w: 40, h: 35, type: 'break', color: '#ff007f', id: 'b3' },
-                
-                // Rampa rebote estática abajo
-                { x: 140, y: 320, w: 120, h: 15, type: 'static', color: '#4a2574' },
-                { x: 250, y: 290, w: 30, h: 45, type: 'break', color: '#ff007f', id: 'b4' }
-            ];
-        }
-    }
-
-    // HABILIDADES
-    applyPoodleSkill() {
-        // Caniche: Escaneo. Resalta el primer bloque rompible que debe eliminarse
-        this.highlightFirstBlock = true;
-        setTimeout(() => this.highlightFirstBlock = false, 5000);
-    }
-
-    applyMalteseSkill() {
-        // Manejado en el loop principal (cámara lenta de física y gravedad)
-    }
-
-    applyChihuahuaSkill() {
-        // Chihuahua: Sonar. Dibuja la trayectoria de la bola proyectada a futuro
-        this.predictTrajectory = true;
-        setTimeout(() => this.predictTrajectory = false, 4000);
-    }
-
-    applyPugSkill() {
-        // Pug: Sacudida Gravitacional. Lanza un impulso fuerte de viento empujando el hueso hacia arriba/derecha
-        this.bone.vx += 1.8;
-        this.bone.vy -= 2.2;
-        window.audio.playLaunch();
-        
-        // Generar partículas de viento
-        this.createWindParticles();
-    }
-
-    applyHuskySkill() {
-        // Husky: Congela el movimiento de las barreras móviles (slide)
-        this.huskyFrozen = true;
-        this.huskyFreezeTimer = 240; // 4 segundos a 60fps
-    }
-
-    applyShepherdSkill() {
-        // Escudo protector visual.
-    }
-
-    deactivateShieldVisual() {}
-
-    // FISICA DE LA ESCENA
-    update() {
-        // Timer de congelación Husky
-        if (this.huskyFrozen) {
-            this.huskyFreezeTimer--;
-            if (this.huskyFreezeTimer <= 0) this.huskyFrozen = false;
-        }
-
-        // Determinar escala de velocidad física (Zen Focus del Maltés)
-        let dt = 1.0;
-        if (window.gameEngine.skillActive && window.gameEngine.selectedDogId === 'maltese') {
-            dt = 0.38; // Ralentizar la física por completo
-        }
-
-        // Mover barreras deslizantes
-        this.blocks.forEach(b => {
-            if (b.type === 'slide' && !this.huskyFrozen) {
-                b.x += b.vx * b.dir * dt;
-                if (b.x <= b.leftLimit) {
-                    b.x = b.leftLimit;
-                    b.dir = 1;
-                } else if (b.x >= b.rightLimit) {
-                    b.x = b.rightLimit;
-                    b.dir = -1;
-                }
-            }
-        });
-
-        // Aplicar gravedad
-        this.bone.vy += this.gravity * dt;
-
-        // Actualizar posiciones integradas
-        this.bone.x += this.bone.vx * dt;
-        this.bone.y += this.bone.vy * dt;
-
-        // Comprobar colisión con bloques
-        this.blocks.forEach(b => {
-            this.resolveCollision(this.bone, b);
-        });
-
-        // Comprobar si llegó al tazón del perro
-        const dx = this.bone.x - this.bowl.x;
-        const dy = this.bone.y - this.bowl.y;
-        const distToBowl = Math.sqrt(dx * dx + dy * dy);
-
-        if (distToBowl < this.bowl.radius + 8) {
-            window.gameEngine.triggerVictory(3); // Victoria
-            this.active = false;
-        }
-
-        // Comprobar si cayó al abismo
-        if (this.bone.y > this.canvas.height + 30) {
-            this.resetBone();
-        }
-
-        // Detección de atascado (si la velocidad es casi 0 durante mucho tiempo y no ha ganado)
-        const speed = Math.sqrt(this.bone.vx * this.bone.vx + this.bone.vy * this.bone.vy);
-        if (speed < 0.05) {
-            this.bone.stuckTimer++;
-            if (this.bone.stuckTimer > 180) { // 3 segundos sin moverse
-                window.gameEngine.showFeedbackText("¡Hueso atascado! Reajustando...", "var(--danger)");
-                this.resetBone();
-            }
-        } else {
-            this.bone.stuckTimer = 0;
-        }
-    }
-
-    resetBone() {
-        this.bone.x = this.difficulty === 'easy' ? 60 : (this.difficulty === 'medium' ? 50 : 60);
-        this.bone.y = 40;
-        this.bone.vx = 0.8;
-        this.bone.vy = 0;
-        this.bone.stuckTimer = 0;
-        this.setupLevel(); // Resetear también los bloques para evitar dejar el nivel sin salida
-    }
-
-    resolveCollision(circle, rect) {
-        // Encontrar punto más cercano en el rectángulo AABB
-        let closestX = Math.max(rect.x, Math.min(circle.x, rect.x + rect.w));
-        let closestY = Math.max(rect.y, Math.min(circle.y, rect.y + rect.h));
-
-        // Calcular distancia
-        let dx = circle.x - closestX;
-        let dy = circle.y - closestY;
-        let dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < circle.radius) {
-            // Dirección de colisión normal
-            let nx = 0;
-            let ny = -1;
-
-            if (dist > 0.001) {
-                nx = dx / dist;
-                ny = dy / dist;
-            } else {
-                // Si el centro de la bola está exactamente sobre un borde del rectángulo
-                return;
-            }
-
-            // Empujar círculo fuera del bloque
-            circle.x = closestX + nx * circle.radius;
-            circle.y = closestY + ny * circle.radius;
-
-            // Velocidad relativa a lo largo de la normal
-            let dot = circle.vx * nx + circle.vy * ny;
-
-            if (dot < 0) {
-                // Aplicar rebote (restitución)
-                circle.vx -= (1 + this.restitution) * dot * nx;
-                circle.vy -= (1 + this.restitution) * dot * ny;
-
-                // Fricción / Resistencia de rodado
-                circle.vx *= this.friction;
-                circle.vy *= this.friction;
-            }
-        }
-    }
-
-    // MANEJO DE ENTRADAS (Hacer tap en bloques rompibles)
-    handleInputStart(x, y) {
-        // Buscar si tocamos algún bloque de tipo 'break'
-        for (let i = 0; i < this.blocks.length; i++) {
-            const b = this.blocks[i];
-            if (b.type === 'break') {
-                if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) {
-                    // Romper bloque
-                    this.blocks.splice(i, 1);
-                    window.audio.playPop();
-                    this.createWoodExplosion(b.x + b.w / 2, b.y + b.h / 2, b.color);
-
-                    // Si el hueso estaba apoyado/atascado contra este bloque (que es el
-                    // caso normal: el bloque actúa de tope), sin este empujón el hueso
-                    // pierde casi toda su velocidad por la fricción y se queda sin poder
-                    // avanzar aunque el bloque ya no esté. Con el empujón retoma el
-                    // camino sin importar cuánto tiempo tardó el jugador en tocarlo.
-                    const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
-                    const dx = this.bone.x - cx, dy = this.bone.y - cy;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    const proximity = b.w / 2 + b.h / 2 + this.bone.radius + 15;
-                    if (dist < proximity) {
-                        const speed = Math.sqrt(this.bone.vx * this.bone.vx + this.bone.vy * this.bone.vy);
-                        if (speed < 1.2) {
-                            this.bone.vx = this.boneKickVx;
-                            this.bone.vy = this.boneKickVy;
-                        }
-                    }
-
-                    this.draw();
-                    break;
-                }
-            }
-        }
-    }
-
-    handleInputMove(x, y) {}
-    handleInputEnd() {}
-
-    // DIBUJADO DE LA ESCENA
-    draw() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Fondo cósmico neón
-        this.ctx.fillStyle = '#0f0821';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // RENDERIZAR TAZÓN DEL PERRITO (OBJETIVO)
-        this.ctx.fillStyle = '#00bbf9';
-        this.ctx.shadowColor = '#00bbf9';
-        this.ctx.shadowBlur = 12;
-        this.ctx.beginPath();
-        // Cuerpo del tazón
-        this.ctx.arc(this.bowl.x, this.bowl.y, this.bowl.radius, 0, Math.PI, false);
-        this.ctx.fill();
-        this.ctx.shadowBlur = 0;
-        
-        // Borde superior
-        this.ctx.fillStyle = '#ffee32';
-        this.ctx.fillRect(this.bowl.x - this.bowl.radius - 4, this.bowl.y - 2, this.bowl.radius * 2 + 8, 5);
-
-        // Decoración de huella canina en el tazón
-        this.ctx.fillStyle = '#0f0821';
-        this.ctx.font = '14px Inter';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.fillText("🐾", this.bowl.x, this.bowl.y + 10);
-
-        // RENDERIZAR TRAYECTORIA PREDICHA (Habilidad Chihuahua)
-        if (this.predictTrajectory) {
-            this.drawPredictedTrajectory();
-        }
-
-        // RENDERIZAR BLOQUES
-        this.blocks.forEach(b => {
-            this.ctx.fillStyle = b.color;
-            this.ctx.shadowBlur = b.type === 'slide' ? 10 : 0;
-            this.ctx.shadowColor = b.color;
-            
-            // Dibujar bloque redondeado
-            this.drawRoundedRect(b.x, b.y, b.w, b.h, 6);
-
-            this.ctx.shadowBlur = 0;
-
-            // Textura visual según tipo
-            if (b.type === 'break') {
-                // Bloque de madera rompible - Patrón cruzado simple
-                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-                this.ctx.lineWidth = 2;
-                this.ctx.beginPath();
-                this.ctx.moveTo(b.x, b.y);
-                this.ctx.lineTo(b.x + b.w, b.y + b.h);
-                this.ctx.moveTo(b.x + b.w, b.y);
-                this.ctx.lineTo(b.x, b.y + b.h);
-                this.ctx.stroke();
-                
-                // Resaltar primer bloque rompible (Habilidad Caniche)
-                if (this.highlightFirstBlock && b.id === 'b1') {
-                    this.ctx.strokeStyle = '#39ff14';
-                    this.ctx.lineWidth = 3;
-                    this.ctx.shadowColor = '#39ff14';
-                    this.ctx.shadowBlur = 15;
-                    this.ctx.strokeRect(b.x - 2, b.y - 2, b.w + 4, b.h + 4);
-                    this.ctx.shadowBlur = 0;
-                }
-            } else if (b.type === 'slide') {
-                // Hielo deslizante - Líneas horizontales de velocidad
-                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-                this.ctx.fillRect(b.x + 5, b.y + b.h/2 - 2, b.w - 10, 4);
-                
-                // Si está congelado por Husky
-                if (this.huskyFrozen) {
-                    this.ctx.strokeStyle = '#ffffff';
-                    this.ctx.lineWidth = 2;
-                    this.ctx.strokeRect(b.x, b.y, b.w, b.h);
-                }
-            }
-        });
-
-        // RENDERIZAR HUESO (PROYECTIL)
-        this.ctx.fillStyle = '#f3f0f7';
-        this.ctx.shadowColor = '#f3f0f7';
-        this.ctx.shadowBlur = 8;
-        
-        this.drawBone(this.bone.x, this.bone.y, this.bone.radius);
-        
-        this.ctx.shadowBlur = 0;
-
-        // Renderizar partículas
-        this.updateAndDrawParticles();
-    }
-
-    drawRoundedRect(x, y, w, h, r) {
-        this.ctx.beginPath();
-        this.ctx.moveTo(x + r, y);
-        this.ctx.lineTo(x + w - r, y);
-        this.ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-        this.ctx.lineTo(x + w, y + h - r);
-        this.ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-        this.ctx.lineTo(x + r, y + h);
-        this.ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-        this.ctx.lineTo(x, y + r);
-        this.ctx.quadraticCurveTo(x, y, x + r, y);
-        this.ctx.closePath();
-        this.ctx.fill();
-    }
-
-    drawBone(x, y, r) {
-        this.ctx.save();
-        this.ctx.translate(x, y);
-        
-        // Simular giro de rodado del hueso basado en velocidad horizontal
-        const angle = this.bone.x / 14;
-        this.ctx.rotate(angle);
-
-        // Dibujar cuerpo
-        this.ctx.fillRect(-r, -r/3, r * 2, r * 0.7);
-        // Cabezas redondeadas del hueso
-        this.ctx.beginPath();
-        this.ctx.arc(-r, -r/3, r/2, 0, Math.PI * 2);
-        this.ctx.arc(-r, r/3, r/2, 0, Math.PI * 2);
-        this.ctx.arc(r, -r/3, r/2, 0, Math.PI * 2);
-        this.ctx.arc(r, r/3, r/2, 0, Math.PI * 2);
-        this.ctx.fill();
-        
-        this.ctx.restore();
-    }
-
-    drawPredictedTrajectory() {
-        // Clonar física temporalmente para correr simulación futura rápida
-        const tempBone = { 
-            x: this.bone.x, 
-            y: this.bone.y, 
-            vx: this.bone.vx, 
-            vy: this.bone.vy, 
-            radius: this.bone.radius 
-        };
-
-        this.ctx.strokeStyle = 'rgba(0, 245, 212, 0.4)';
-        this.ctx.lineWidth = 2;
-        this.ctx.setLineDash([4, 4]);
-        this.ctx.beginPath();
-        this.ctx.moveTo(tempBone.x, tempBone.y);
-
-        for (let step = 0; step < 120; step++) { // Simular 120 frames adelante
-            tempBone.vy += this.gravity;
-            tempBone.x += tempBone.vx;
-            tempBone.y += tempBone.vy;
-
-            // Resolver colisión con bloques estáticos/móviles actuales en su posición estática
-            this.blocks.forEach(b => {
-                let closestX = Math.max(b.x, Math.min(tempBone.x, b.x + b.w));
-                let closestY = Math.max(b.y, Math.min(tempBone.y, b.y + b.h));
-                let dx = tempBone.x - closestX;
-                let dy = tempBone.y - closestY;
-                let dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist < tempBone.radius) {
-                    let nx = 0; let ny = -1;
-                    if (dist > 0.001) { nx = dx / dist; ny = dy / dist; }
-                    tempBone.x = closestX + nx * tempBone.radius;
-                    tempBone.y = closestY + ny * tempBone.radius;
-                    let dot = tempBone.vx * nx + tempBone.vy * ny;
-                    if (dot < 0) {
-                        tempBone.vx -= (1 + this.restitution) * dot * nx;
-                        tempBone.vy -= (1 + this.restitution) * dot * ny;
-                        tempBone.vx *= this.friction;
-                        tempBone.vy *= this.friction;
-                    }
-                }
-            });
-
-            this.ctx.lineTo(tempBone.x, tempBone.y);
-            
-            // Parar simulación si sale del canvas
-            if (tempBone.y > this.canvas.height) break;
-        }
-        
-        this.ctx.stroke();
-        this.ctx.setLineDash([]); // Restablecer
-    }
-
-    gameLoop() {
-        if (!this.active) return;
-        this.update();
-        this.draw();
-        this.animationId = requestAnimationFrame(() => this.gameLoop());
-    }
-
-    // SISTEMA DE PARTÍCULAS
-    particles = [];
-    
-    createWoodExplosion(x, y, color) {
-        for (let i = 0; i < 12; i++) {
-            this.particles.push({
-                x: x,
-                y: y,
-                vx: (Math.random() - 0.5) * 5,
-                vy: (Math.random() - 0.5) * 5 - 2,
-                radius: 2 + Math.random() * 4,
-                color: color,
-                alpha: 1,
-                life: 30 + Math.random() * 15
-            });
-        }
-    }
-
-    createWindParticles() {
-        for (let i = 0; i < 15; i++) {
-            this.particles.push({
-                x: this.bone.x - 20,
-                y: this.bone.y + (Math.random() - 0.5) * 15,
-                vx: 4 + Math.random() * 3,
-                vy: -1 - Math.random() * 2,
-                radius: 1.5 + Math.random() * 2,
-                color: 'rgba(0, 245, 212, 0.4)',
-                alpha: 0.8,
-                life: 20 + Math.random() * 10
-            });
-        }
-    }
-
-    updateAndDrawParticles() {
-        for (let i = this.particles.length - 1; i >= 0; i--) {
-            const p = this.particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.alpha -= 1 / p.life;
-
-            if (p.alpha <= 0) {
-                this.particles.splice(i, 1);
-                continue;
-            }
-
-            this.ctx.fillStyle = p.color;
-            this.ctx.globalAlpha = p.alpha;
-            this.ctx.beginPath();
-            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-            this.ctx.fill();
-        }
-        this.ctx.globalAlpha = 1.0;
-    }
+function recompensar(tipo,puntos){
+  const mult=multiplicador();
+  const p=Math.round(puntos*mult);
+  if(tipo==='calculo'){pet.hambre=Math.min(100,pet.hambre+p);pet.energia=Math.max(0,pet.energia-p*.3)}
+  if(tipo==='grid'){pet.felicidad=Math.min(100,pet.felicidad+p);pet.salud=Math.min(100,pet.salud+p*.2)}
+  if(tipo==='memoria'){pet.energia=Math.min(100,pet.energia+p);pet.hambre=Math.min(100,pet.hambre+p*.2)}
+  if(tipo==='ovejas'){pet.energia=Math.min(100,pet.energia+p*2);pet.salud=Math.min(100,pet.salud+p*.3)}
+  pet.estrellas+=Math.ceil(p/5);
+  ganarXP(puntos*2);
 }
 
-</script>
-<script>
-// ===== GAME.JS =====
-// MOTOR DE JUEGO PRINCIPAL - MENTAL PAWS
-
-class GameEngine {
-    constructor() {
-        this.currentScreen = 'screen-main-menu';
-        this.selectedDogId = 'poodle';
-        this.currentLevelIndex = 1; // 1 a 9
-        this.lives = 3;
-        this.timeRemaining = 30;
-        this.timerInterval = null;
-        this.skillCooldownActive = false;
-        this.skillActive = false;
-        this.shieldActive = false; // Habilidad Policia 
-        this.score = 0;
-        
-        // Progreso guardado
-        this.progress = {
-            unlockedLevels: 1, // Nivel máximo desbloqueado
-            completedLevels: {}, // { levelNum: stars }
-        };
-
-        // Definición de Perritos
-        this.dogs = {
-            poodle: {
-                id: 'poodle',
-                name: 'Caniche (Poodle)',
-                role: 'Protagonista',
-                isProtagonist: true,
-                unlockLevel: 1,
-                skillName: 'Escaneo Lógico',
-                skillDesc: 'Resalta el objetivo correcto o la primera conexión correcta por unos segundos.',
-                asset: 'assets/poodle.png',
-                fallbackEmoji: '🐩',
-                cooldown: 12000 // ms
-            },
-            maltese: {
-                id: 'maltese',
-                name: 'Maltés',
-                role: 'Protagonista',
-                isProtagonist: true,
-                unlockLevel: 1,
-                skillName: 'Enfoque Zen',
-                skillDesc: 'Ralentiza el tiempo a la mitad y añade +10 segundos al reloj del juego.',
-                asset: 'assets/maltese.png',
-                fallbackEmoji: '🐶',
-                cooldown: 15000
-            },
-            chihuahua: {
-                id: 'chihuahua',
-                name: 'Chihuahua',
-                role: 'Jugable',
-                isProtagonist: false,
-                unlockLevel: 2,
-                skillName: 'Ladrido de Sonar',
-                skillDesc: 'Elimina un globo/camino incorrecto o revela la trayectoria de caída.',
-                asset: 'assets/chihuahua.png',
-                fallbackEmoji: '🐕',
-                cooldown: 10000
-            },
-            pug: {
-                id: 'pug',
-                name: 'Pug',
-                role: 'Jugable',
-                isProtagonist: false,
-                unlockLevel: 3,
-                skillName: 'Sorbo de Gravedad',
-                skillDesc: 'Genera un soplido que atrae objetivos o sacude bloques atascados.',
-                asset: 'assets/pug.png',
-                fallbackEmoji: '🐽',
-                cooldown: 8000
-            },
-            golden: {
-                id: 'golden',
-                name: 'Golden Retriever',
-                role: 'Jugable',
-                isProtagonist: false,
-                unlockLevel: 4,
-                skillName: 'Fetch Hint',
-                skillDesc: 'Su olfato deduce una pista textual directa sobre cómo ganar.',
-                asset: 'assets/golden.png',
-                fallbackEmoji: '🦮',
-                cooldown: 14000
-            },
-            husky: {
-                id: 'husky',
-                name: 'Husky Siberiano',
-                role: 'Jugable',
-                isProtagonist: false,
-                unlockLevel: 5,
-                skillName: 'Gelo-Congelación',
-                skillDesc: 'Detiene todo movimiento en la pantalla por 4 segundos sin congelar el tiempo.',
-                asset: 'assets/husky.png',
-                fallbackEmoji: '🐺',
-                cooldown: 16000
-            },
-            shepherd: {
-                id: 'shepherd',
-                name: 'Policia ',
-                role: 'Jugable',
-                isProtagonist: false,
-                unlockLevel: 6,
-                skillName: 'Escudo Guardián',
-                skillDesc: 'Protege contra un error. Si fallas o se acaba el tiempo, no perderás vidas.',
-                asset: 'assets/shepherd.png',
-                fallbackEmoji: '👮',
-                cooldown: 18000
-            }
-        };
-
-        // Definición de Niveles
-        this.levels = {
-            1: { type: 'slingshot', difficulty: 'easy', time: 35, name: 'Tiro Stroop Inicial' },
-            2: { type: 'flow', difficulty: 'easy', time: 45, name: 'Conexión Neuronal Simple' },
-            3: { type: 'gravity', difficulty: 'easy', time: 30, name: 'Caída Controlada' },
-            4: { type: 'slingshot', difficulty: 'medium', time: 30, name: 'Interferencia Stroop' },
-            5: { type: 'flow', difficulty: 'medium', time: 50, name: 'Cruce Sináptico' },
-            6: { type: 'gravity', difficulty: 'medium', time: 35, name: 'Obstáculos Móviles' },
-            7: { type: 'slingshot', difficulty: 'hard', time: 25, name: 'Caos Cognitivo' },
-            8: { type: 'flow', difficulty: 'hard', time: 60, name: 'Red Neuronal Compleja' },
-            9: { type: 'gravity', difficulty: 'hard', time: 40, name: 'Laberinto Físico' }
-        };
-    }
-
-    init() {
-        this.loadProgress();
-        this.renderCharacterGrid();
-        this.selectDog(this.selectedDogId);
-        this.renderLevelsMap();
-        
-        // Agregar sonido al hacer clic en cualquier botón interactivo
-        document.querySelectorAll('button, .level-node, .character-card').forEach(el => {
-            el.addEventListener('click', () => window.audio.playClick());
-        });
-
-        // Habilitar clics en el lienzo si es necesario
-        const canvas = document.getElementById('game-canvas');
-        canvas.addEventListener('mousedown', (e) => this.handleCanvasInputStart(e));
-        canvas.addEventListener('mousemove', (e) => this.handleCanvasInputMove(e));
-        canvas.addEventListener('mouseup', (e) => this.handleCanvasInputEnd(e));
-        canvas.addEventListener('mouseleave', (e) => this.handleCanvasInputEnd(e));
-        
-        // Eventos táctiles
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const mouseEvent = new MouseEvent('mousedown', {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            canvas.dispatchEvent(mouseEvent);
-        }, { passive: false });
-
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const mouseEvent = new MouseEvent('mousemove', {
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-            canvas.dispatchEvent(mouseEvent);
-        }, { passive: false });
-
-        canvas.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            const mouseEvent = new MouseEvent('mouseup', {});
-            canvas.dispatchEvent(mouseEvent);
-        }, { passive: false });
-    }
-
-    // NAVEGACIÓN DE PANTALLAS (SPA)
-    switchScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        const target = document.getElementById(screenId);
-        if (target) {
-            target.classList.add('active');
-            this.currentScreen = screenId;
-        }
-
-        if (screenId === 'screen-levels') {
-            this.renderLevelsMap();
-        } else if (screenId === 'screen-characters') {
-            this.renderCharacterGrid();
-        }
-    }
-
-    // PERSISTENCIA
-    loadProgress() {
-        const saved = localStorage.getItem('mental_paws_progress');
-        if (saved) {
-            try {
-                this.progress = JSON.parse(saved);
-            } catch (e) {
-                console.error("Error al cargar progreso", e);
-            }
-        }
-    }
-
-    saveProgress() {
-        localStorage.setItem('mental_paws_progress', JSON.stringify(this.progress));
-    }
-
-    // MANEJO DE PERRITOS
-    renderCharacterGrid() {
-        const container = document.getElementById('characters-list');
-        container.innerHTML = '';
-        
-        Object.keys(this.dogs).forEach(id => {
-            const dog = this.dogs[id];
-            const isUnlocked = this.progress.unlockedLevels >= dog.unlockLevel;
-            
-            const card = document.createElement('div');
-            card.className = `character-card ${this.selectedDogId === id ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`;
-            
-            // Imagen o Fallback
-            let imgHTML = `<div class="card-avatar-fallback">${dog.fallbackEmoji}</div>`;
-            if (isUnlocked) {
-                imgHTML = `<img src="${dog.asset}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" alt="${dog.name}">
-                           <div class="card-avatar-fallback" style="display:none;">${dog.fallbackEmoji}</div>`;
-            }
-
-            card.innerHTML = `
-                ${imgHTML}
-                <p>${dog.name.split(' ')[0]}</p>
-            `;
-            
-            if (isUnlocked) {
-                card.onclick = () => {
-                    window.audio.playClick();
-                    this.selectDog(id);
-                };
-            } else {
-                card.innerHTML += `<div style="font-size: 8px; color: var(--danger); font-weight: 800;">Nivel ${dog.unlockLevel}</div>`;
-            }
-            container.appendChild(card);
-        });
-    }
-
-    selectDog(dogId) {
-        this.selectedDogId = dogId;
-        
-        // Actualizar UI en pantalla de selección
-        document.querySelectorAll('.character-card').forEach(c => c.classList.remove('active'));
-        const cards = document.querySelectorAll('.character-card');
-        const dogKeys = Object.keys(this.dogs);
-        const index = dogKeys.indexOf(dogId);
-        if (cards[index]) cards[index].classList.add('active');
-
-        // Renderizar panel de detalle
-        const dog = this.dogs[dogId];
-        const detailPanel = document.getElementById('character-detail-panel');
-        
-        let imgHTML = `<div class="detail-fallback">${dog.fallbackEmoji}</div>`;
-        imgHTML = `<img class="detail-img" src="${dog.asset}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" alt="${dog.name}">
-                   <div class="detail-fallback" style="display:none;">${dog.fallbackEmoji}</div>`;
-
-        detailPanel.innerHTML = `
-            <div class="detail-header">
-                ${imgHTML}
-                <div class="detail-meta">
-                    <h3>${dog.name}</h3>
-                    <span class="${dog.isProtagonist ? 'tag-protagonist' : 'tag-unlock'}">
-                        ${dog.isProtagonist ? 'Protagonista' : 'Adicional'}
-                    </span>
-                </div>
-            </div>
-            <div class="skill-description">
-                <strong>Habilidad: ${dog.skillName}</strong>
-                ${dog.skillDesc}
-            </div>
-            <button class="btn btn-primary" onclick="window.gameEngine.switchScreen('screen-levels')">
-                <span>SELECCIONAR Y CONTINUAR</span>
-            </button>
-        `;
-    }
-
-    // MAPA DE NIVELES
-    renderLevelsMap() {
-        const container = document.getElementById('levels-map-container');
-        container.innerHTML = '';
-        
-        for (let i = 1; i <= 9; i++) {
-            const level = this.levels[i];
-            const isUnlocked = i <= this.progress.unlockedLevels;
-            const isCompleted = this.progress.completedLevels[i] !== undefined;
-            const stars = this.progress.completedLevels[i] || 0;
-            
-            const node = document.createElement('div');
-            node.className = `level-node ${isCompleted ? 'completed' : (isUnlocked ? 'unlocked' : 'locked')}`;
-            
-            let starsHTML = '';
-            if (isCompleted) {
-                starsHTML = '<div class="stars">' + '★'.repeat(stars) + '☆'.repeat(3-stars) + '</div>';
-            } else if (isUnlocked) {
-                starsHTML = '<div class="stars" style="color:var(--text-muted);">☆☆☆</div>';
-            }
-
-            node.innerHTML = `
-                <div class="num">${i}</div>
-                ${starsHTML}
-            `;
-            
-            if (isUnlocked) {
-                node.onclick = () => {
-                    window.audio.playClick();
-                    this.startLevel(i);
-                };
-            }
-            container.appendChild(node);
-        }
-    }
-
-    // LOGICA DE JUEGO ACTIVO
-    startLevel(levelNum) {
-        this.currentLevelIndex = levelNum;
-        const config = this.levels[levelNum];
-        this.lives = 3;
-        this.timeRemaining = config.time;
-        this.skillCooldownActive = false;
-        this.skillActive = false;
-        this.shieldActive = false;
-        
-        // Configurar UI de Gameplay
-        document.getElementById('current-level-title').innerText = `Nivel ${levelNum}`;
-        document.getElementById('game-timer').innerText = `${this.timeRemaining}s`;
-        this.updateLivesUI();
-        
-        // Perrito Activo en Barra Inferior
-        const dog = this.dogs[this.selectedDogId];
-        document.getElementById('active-dog-name').innerText = dog.name.split(' ')[0];
-        document.getElementById('active-dog-skill-desc').innerText = dog.skillName;
-        
-        const activeImg = document.getElementById('active-dog-img');
-        const activeFallback = document.getElementById('active-dog-fallback-avatar');
-        
-        activeImg.src = dog.asset;
-        activeImg.onload = () => {
-            activeImg.style.display = 'block';
-            activeFallback.style.display = 'none';
-        };
-        activeImg.onerror = () => {
-            activeImg.style.display = 'none';
-            activeFallback.innerText = dog.fallbackEmoji;
-            activeFallback.style.display = 'flex';
-        };
-
-        // Resetear botón de habilidad
-        const skillBtn = document.getElementById('btn-trigger-skill');
-        skillBtn.classList.remove('disabled');
-        document.getElementById('skill-cooldown-overlay').style.width = '0%';
-        document.getElementById('skill-btn-text').innerText = '¡HABILIDAD!';
-
-        // Configurar Hemisferio Activo en UI
-        const hemisphereEl = document.getElementById('active-hemisphere');
-        if (config.type === 'slingshot') {
-            hemisphereEl.innerText = 'Cerebro: Conflicto';
-            hemisphereEl.style.color = 'var(--accent)';
-        } else if (config.type === 'flow') {
-            hemisphereEl.innerText = 'Cerebro: Izq/Der';
-            hemisphereEl.style.color = 'var(--secondary)';
-        } else {
-            hemisphereEl.innerText = 'Cerebro: Físico';
-            hemisphereEl.style.color = 'var(--yellow)';
-        }
-
-        // Cargar el juego en sí
-        this.switchScreen('screen-gameplay');
-        this.loadSubGame(config);
-        
-        // Iniciar reloj
-        this.startTimer();
-    }
-
-    loadSubGame(config) {
-        // Detener juegos anteriores
-        if (window.currentGame && typeof window.currentGame.destroy === 'function') {
-            window.currentGame.destroy();
-        }
-
-        const canvas = document.getElementById('game-canvas');
-        
-        // Determinar qué juego inicializar
-        if (config.type === 'slingshot') {
-            window.currentGame = new SlingshotGame(canvas, config.difficulty);
-        } else if (config.type === 'flow') {
-            window.currentGame = new FlowGame(canvas, config.difficulty);
-        } else if (config.type === 'gravity') {
-            window.currentGame = new GravityGame(canvas, config.difficulty);
-        }
-        
-        // Iniciar
-        window.currentGame.start();
-    }
-
-    startTimer() {
-        if (this.timerInterval) clearInterval(this.timerInterval);
-        
-        this.timerInterval = setInterval(() => {
-            // Habilidad Zen de Maltés ralentiza el timer
-            let timeStep = 1;
-            if (this.skillActive && this.selectedDogId === 'maltese') {
-                // Habilidad Zen hace que cada segundo real consuma solo 0.3 segundos del juego
-                timeStep = 0.3;
-            }
-            
-            // Usar floats internamente para precisión con cámara lenta, pero mostrar enteros
-            if (!this.skillActive || this.selectedDogId !== 'husky') { // Husky puede congelar el timer temporalmente
-                this.timeRemaining -= timeStep;
-            }
-            
-            const displayTime = Math.max(0, Math.ceil(this.timeRemaining));
-            document.getElementById('game-timer').innerText = `${displayTime}s`;
-            
-            if (this.timeRemaining <= 0) {
-                this.handleTimeout();
-            }
-        }, 1000);
-    }
-
-    stopTimer() {
-        if (this.timerInterval) {
-            clearInterval(this.timerInterval);
-            this.timerInterval = null;
-        }
-    }
-
-    updateLivesUI() {
-        const hearts = '❤️'.repeat(Math.max(0, this.lives)) + '🖤'.repeat(Math.max(0, 3 - this.lives));
-        document.getElementById('game-lives').innerText = hearts;
-    }
-
-    handleMistake() {
-        window.audio.playError();
-        
-        // Si la habilidad de Policia está activa (Escudo)
-        if (this.shieldActive) {
-            this.shieldActive = false;
-            // Remover brillo visual del escudo en el juego
-            if (window.currentGame && typeof window.currentGame.deactivateShieldVisual === 'function') {
-                window.currentGame.deactivateShieldVisual();
-            }
-            // Mostrar texto
-            this.showFeedbackText("¡ESCUDO ROTO! Te salvaste.", "var(--yellow)");
-            return;
-        }
-
-        this.lives--;
-        this.updateLivesUI();
-        
-        if (this.lives <= 0) {
-            this.triggerDefeat();
-        } else {
-            this.showFeedbackText("¡Error! -1 Vida", "var(--danger)");
-        }
-    }
-
-    handleTimeout() {
-        this.stopTimer();
-        
-        if (this.shieldActive) {
-            this.shieldActive = false;
-            this.timeRemaining = 15; // Dar 15 segundos extras
-            this.startTimer();
-            this.showFeedbackText("¡Escudo roto! +15s de gracia.", "var(--yellow)");
-            return;
-        }
-
-        this.triggerDefeat();
-    }
-
-    showFeedbackText(text, color = "var(--text-white)") {
-        const instructionEl = document.getElementById('game-instruction-text');
-        const oldText = instructionEl.innerText;
-        instructionEl.innerText = text;
-        instructionEl.style.color = color;
-        instructionEl.style.fontWeight = "bold";
-        
-        setTimeout(() => {
-            if (instructionEl.innerText === text) {
-                instructionEl.innerText = oldText;
-                instructionEl.style.color = "";
-                instructionEl.style.fontWeight = "";
-            }
-        }, 2000);
-    }
-
-    // ACCIONES DE BOTONES
-    triggerActiveSkill() {
-        if (this.skillCooldownActive || this.skillActive) return;
-        
-        const dog = this.dogs[this.selectedDogId];
-        window.audio.playSkill();
-        
-        // Activar habilidad
-        this.skillActive = true;
-        this.skillCooldownActive = true;
-        
-        // Aplicar efectos según el perro
-        this.applySkillEffect(dog.id);
-        
-        // UI de cooldown
-        const skillBtn = document.getElementById('btn-trigger-skill');
-        skillBtn.classList.add('disabled');
-        document.getElementById('skill-btn-text').innerText = 'ACTIVA';
-        
-        // Animación visual del botón
-        const cooldownOverlay = document.getElementById('skill-cooldown-overlay');
-        cooldownOverlay.style.transition = 'none';
-        cooldownOverlay.style.width = '100%';
-        
-        // Tiempo de duración de habilidad activa
-        let activeDuration = 4000; // Por defecto 4 seg
-        if (dog.id === 'maltese') activeDuration = 10000; // Zen focus dura 10s
-        if (dog.id === 'shepherd') activeDuration = 30000; // Escudo dura hasta romperse o acabar nivel
-
-        setTimeout(() => {
-            this.skillActive = false;
-            if (dog.id !== 'shepherd' || !this.shieldActive) {
-                document.getElementById('skill-btn-text').innerText = 'RECARGANDO';
-            }
-            
-            // Iniciar animación de enfriamiento (cooldown)
-            setTimeout(() => {
-                cooldownOverlay.style.transition = `width ${dog.cooldown / 1000}s linear`;
-                cooldownOverlay.style.width = '0%';
-            }, 50);
-
-            // Terminar recarga
-            setTimeout(() => {
-                this.skillCooldownActive = false;
-                if (!this.skillActive) {
-                    skillBtn.classList.remove('disabled');
-                    document.getElementById('skill-btn-text').innerText = '¡HABILIDAD!';
-                }
-            }, dog.cooldown);
-
-        }, activeDuration);
-    }
-
-    applySkillEffect(dogId) {
-        const config = this.levels[this.currentLevelIndex];
-        
-        switch(dogId) {
-            case 'poodle': // Escaneo Lógico
-                this.showFeedbackText("¡Escaneo Lógico Activado!", "var(--secondary)");
-                if (window.currentGame && typeof window.currentGame.applyPoodleSkill === 'function') {
-                    window.currentGame.applyPoodleSkill();
-                }
-                break;
-            case 'maltese': // Enfoque Zen
-                this.showFeedbackText("¡Enfoque Zen! Tiempo lento +10s", "var(--secondary)");
-                this.timeRemaining += 10;
-                if (window.currentGame && typeof window.currentGame.applyMalteseSkill === 'function') {
-                    window.currentGame.applyMalteseSkill();
-                }
-                break;
-            case 'chihuahua': // Ladrido Sonar
-                this.showFeedbackText("¡Ladrido de Sonar!", "var(--secondary)");
-                if (window.currentGame && typeof window.currentGame.applyChihuahuaSkill === 'function') {
-                    window.currentGame.applyChihuahuaSkill();
-                }
-                break;
-            case 'pug': // Gravedad
-                this.showFeedbackText("¡Sacudida Gravitacional!", "var(--secondary)");
-                if (window.currentGame && typeof window.currentGame.applyPugSkill === 'function') {
-                    window.currentGame.applyPugSkill();
-                }
-                break;
-            case 'golden': // Fetch Hint
-                let hint = "Enfócate en la coordinación visual.";
-                if (config.type === 'slingshot') {
-                    hint = "Lee con cuidado la palabra instruida en verde.";
-                } else if (config.type === 'flow') {
-                    hint = "Traza primero las esquinas y los caminos largos.";
-                } else if (config.type === 'gravity') {
-                    hint = "Rompe bloques para crear una rampa uniforme hacia el plato.";
-                }
-                this.showFeedbackText(`Pista: ${hint}`, "var(--yellow)");
-                break;
-            case 'husky': // Gelo-Congelación
-                this.showFeedbackText("¡Pantalla Congelada!", "var(--secondary)");
-                if (window.currentGame && typeof window.currentGame.applyHuskySkill === 'function') {
-                    window.currentGame.applyHuskySkill();
-                }
-                break;
-            case 'shepherd': // Escudo Guardián
-                this.shieldActive = true;
-                this.showFeedbackText("¡Escudo Guardián Activo!", "var(--secondary)");
-                if (window.currentGame && typeof window.currentGame.applyShepherdSkill === 'function') {
-                    window.currentGame.applyShepherdSkill();
-                }
-                break;
-        }
-    }
-
-    // RESOLVER, REINTENTAR, BRINCAR Y VICTÓRIA
-    triggerVictory(scoreStars) {
-        this.stopTimer();
-        window.audio.playVictory();
-        
-        // Guardar estrellas si son mayores a las registradas
-        const prevStars = this.progress.completedLevels[this.currentLevelIndex] || 0;
-        if (scoreStars > prevStars) {
-            this.progress.completedLevels[this.currentLevelIndex] = scoreStars;
-        }
-
-        // Desbloquear siguiente nivel si aplica
-        if (this.currentLevelIndex === this.progress.unlockedLevels && this.currentLevelIndex < 9) {
-            this.progress.unlockedLevels++;
-        }
-        this.saveProgress();
-
-        // Mostrar Modal de Victoria
-        document.getElementById('victory-time-stat').innerText = `${Math.ceil(this.levels[this.currentLevelIndex].time - this.timeRemaining)}s`;
-        
-        let hemisphere = "Derecho (Espacial)";
-        if (this.levels[this.currentLevelIndex].type === 'slingshot') {
-            hemisphere = "Ambos (Hemisferios Cruzados)";
-        } else if (this.levels[this.currentLevelIndex].type === 'flow') {
-            hemisphere = "Izquierdo (Secuencial y Lógico)";
-        }
-        document.getElementById('victory-hemisphere-stat').innerText = hemisphere;
-
-        const modal = document.getElementById('modal-victory');
-        modal.classList.add('active');
-        
-        // Si es el nivel 9, cambiar texto del botón final
-        const nextBtn = document.getElementById('btn-next-level');
-        if (this.currentLevelIndex === 9) {
-            nextBtn.innerText = "¡Ver Créditos y Terminar!";
-            nextBtn.onclick = () => {
-                modal.classList.remove('active');
-                this.showCredits();
-            };
-        } else {
-            nextBtn.innerText = "Siguiente Nivel";
-            nextBtn.onclick = () => {
-                modal.classList.remove('active');
-                this.nextLevel();
-            };
-        }
-    }
-
-    triggerDefeat() {
-        this.stopTimer();
-        window.audio.playDefeat();
-        document.getElementById('modal-defeat').classList.add('active');
-    }
-
-    skipLevel() {
-        this.stopTimer();
-        window.audio.playClick();
-        
-        // Ocultar modales activos
-        document.getElementById('modal-defeat').classList.remove('active');
-        document.getElementById('modal-pause').classList.remove('active');
-        
-        // Saltar nivel desbloquea ficticiamente el siguiente en el progreso (sin guardar estrellas)
-        if (this.currentLevelIndex === this.progress.unlockedLevels && this.currentLevelIndex < 9) {
-            this.progress.unlockedLevels++;
-            this.saveProgress();
-        }
-        
-        // Ir a la siguiente pantalla
-        if (this.currentLevelIndex < 9) {
-            this.startLevel(this.currentLevelIndex + 1);
-        } else {
-            this.exitToMenu();
-        }
-    }
-
-    nextLevel() {
-        if (this.currentLevelIndex < 9) {
-            this.startLevel(this.currentLevelIndex + 1);
-        } else {
-            this.exitToMenu();
-        }
-    }
-
-    restartLevel() {
-        document.getElementById('modal-defeat').classList.remove('active');
-        document.getElementById('modal-pause').classList.remove('active');
-        this.startLevel(this.currentLevelIndex);
-    }
-
-    pauseGame() {
-        this.stopTimer();
-        window.audio.playClick();
-        document.getElementById('modal-pause').classList.add('active');
-    }
-
-    resumeGame() {
-        window.audio.playClick();
-        document.getElementById('modal-pause').classList.remove('active');
-        this.startTimer();
-    }
-
-    exitToMenu() {
-        this.stopTimer();
-        window.audio.playClick();
-        // Ocultar modales
-        document.getElementById('modal-pause').classList.remove('active');
-        document.getElementById('modal-defeat').classList.remove('active');
-        document.getElementById('modal-victory').classList.remove('active');
-        
-        this.switchScreen('screen-levels');
-    }
-
-    // AYUDA MODAL
-    openHelpModal() {
-        window.audio.playClick();
-        document.getElementById('modal-help').classList.add('active');
-    }
-
-    closeHelpModal() {
-        window.audio.playClick();
-        document.getElementById('modal-help').classList.remove('active');
-    }
-
-    showCredits() {
-        alert("🐕 ¡Felicidades! Completaste Mental Paws. Has ejercitado tu cerebro y demostrado ser el mejor amigo del hombre. ¡Sigue entrenando!");
-        this.exitToMenu();
-    }
-
-    // ENRUTADORES DE INPUTS DEL CANVAS
-    handleCanvasInputStart(e) {
-        if (window.currentGame && typeof window.currentGame.handleInputStart === 'function') {
-            const rect = e.target.getBoundingClientRect();
-            const scaleX = e.target.width / rect.width;
-            const scaleY = e.target.height / rect.height;
-            const x = (e.clientX - rect.left) * scaleX;
-            const y = (e.clientY - rect.top) * scaleY;
-            window.currentGame.handleInputStart(x, y);
-        }
-    }
-
-    handleCanvasInputMove(e) {
-        if (window.currentGame && typeof window.currentGame.handleInputMove === 'function') {
-            const rect = e.target.getBoundingClientRect();
-            const scaleX = e.target.width / rect.width;
-            const scaleY = e.target.height / rect.height;
-            const x = (e.clientX - rect.left) * scaleX;
-            const y = (e.clientY - rect.top) * scaleY;
-            window.currentGame.handleInputMove(x, y);
-        }
-    }
-
-    handleCanvasInputEnd(e) {
-        if (window.currentGame && typeof window.currentGame.handleInputEnd === 'function') {
-            window.currentGame.handleInputEnd();
-        }
-    }
+// ===== MATH HELPERS =====
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function genOps(correct,n=4){
+  const s=new Set([correct]);let att=0;
+  while(s.size<n&&att<100){const off=rand(1,Math.max(2,Math.ceil(Math.abs(correct)*.2+2)));const v=correct+(Math.random()>.5?off:-off);if(v>=0&&v!==correct&&!s.has(v))s.add(v);att++}
+  while(s.size<n)s.add(s.size*100+rand(1,99));
+  return[...s].sort(()=>Math.random()-.5);
+}
+function genProb(dif){
+  const ops=['+','−','×'];const op=ops[rand(0,dif>=2?2:1)];
+  let a,b,ans;const mx=dif<2?15:dif<4?30:50;const mn=dif<2?1:dif<4?3:10;
+  switch(op){case'+':a=rand(mn,mx);b=rand(mn,mx);ans=a+b;break;case'−':a=rand(mn+5,mx+10);b=rand(mn,a-1);ans=a-b;break;case'×':a=rand(1,Math.min(10,dif+3));b=rand(1,Math.min(8,dif+2));ans=a*b;break}
+  return{a,b,op,ans};
 }
 
-// Inicialización Automática al cargar el script
-window.addEventListener('DOMContentLoaded', () => {
-    window.gameEngine = new GameEngine();
-    window.gameEngine.init();
-});
-
-</script>
-<script>
-// ===== MEJORAS ADICIONALES =====
-
-// Sistema de Logros
-class AchievementManager {
-    constructor() {
-        this.achievements = {
-            'first_win': { name: 'Primer Éxito', desc: 'Completa tu primer nivel', icon: '🏆', unlocked: false },
-            'speed_demon': { name: 'Velocista Mental', desc: 'Completa un nivel en menos de 10s', icon: '⚡', unlocked: false },
-            'perfect_game': { name: 'Juego Perfecto', desc: 'Completa un nivel sin errores', icon: '💎', unlocked: false },
-            'combo_master': { name: 'Maestro del Combo', desc: 'Consigue 5 aciertos seguidos', icon: '🔥', unlocked: false },
-            'all_stars': { name: 'Coleccionista', desc: 'Obtén 3 estrellas en 5 niveles', icon: '⭐', unlocked: false },
-            'dog_lover': { name: 'Amante de los Perros', desc: 'Desbloquea todos los perritos', icon: '🐕', unlocked: false },
-            'stroop_expert': { name: 'Experto Stroop', desc: 'Completa 3 niveles de slingshot', icon: '🎯', unlocked: false },
-            'flow_master': { name: 'Maestro de Conexiones', desc: 'Completa 3 niveles de flow', icon: '🔗', unlocked: false },
-            'gravity_defier': { name: 'Desafiando la Gravedad', desc: 'Completa 3 niveles de gravity', icon: '🪐', unlocked: false },
-            'skill_spammer': { name: 'Spammer de Habilidades', desc: 'Usa habilidades 20 veces', icon: '✨', unlocked: false }
-        };
-        this.stats = {
-            totalGames: 0, totalWins: 0, totalLosses: 0,
-            bestTime: Infinity, totalSkillsUsed: 0,
-            currentCombo: 0, maxCombo: 0, perfectGames: 0
-        };
-        this.load();
-    }
-
-    load() {
-        const saved = localStorage.getItem('mental_paws_achievements_v2');
-        if (saved) {
-            try {
-                const data = JSON.parse(saved);
-                if (data.achievements) Object.assign(this.achievements, data.achievements);
-                if (data.stats) Object.assign(this.stats, data.stats);
-            } catch (e) { console.error('Error cargando logros', e); }
-        }
-    }
-
-    save() {
-        localStorage.setItem('mental_paws_achievements_v2', JSON.stringify({
-            achievements: this.achievements,
-            stats: this.stats
-        }));
-    }
-
-    unlock(id) {
-        if (this.achievements[id] && !this.achievements[id].unlocked) {
-            this.achievements[id].unlocked = true;
-            this.save();
-            this.showNotification(this.achievements[id]);
-            return true;
-        }
-        return false;
-    }
-
-    showNotification(achievement) {
-        const notif = document.createElement('div');
-        notif.className = 'floating-notification';
-        notif.innerHTML = `
-            <div style="font-size: 32px;">${achievement.icon}</div>
-            <div>
-                <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 2px;">¡Logro Desbloqueado!</div>
-                <div style="font-size: 16px; font-weight: 800;">${achievement.name}</div>
-                <div style="font-size: 11px; opacity: 0.7;">${achievement.desc}</div>
-            </div>
-        `;
-        document.body.appendChild(notif);
-        setTimeout(() => notif.remove(), 4500);
-        if (window.audio) window.audio.playVictory();
-    }
-
-    checkAfterGame(won, timeUsed, mistakes, levelType) {
-        this.stats.totalGames++;
-        if (won) {
-            this.stats.totalWins++;
-            this.stats.currentCombo++;
-            if (this.stats.currentCombo > this.stats.maxCombo) this.stats.maxCombo = this.stats.currentCombo;
-            if (this.stats.currentCombo >= 5) this.unlock('combo_master');
-            if (mistakes === 0) { this.stats.perfectGames++; this.unlock('perfect_game'); }
-            if (timeUsed < 10) this.unlock('speed_demon');
-            if (this.stats.totalWins === 1) this.unlock('first_win');
-
-            const ge = window.gameEngine;
-            if (ge) {
-                const threeStars = Object.values(ge.progress.completedLevels).filter(s => s === 3).length;
-                if (threeStars >= 5) this.unlock('all_stars');
-
-                const typeCounts = { slingshot: 0, flow: 0, gravity: 0 };
-                Object.keys(ge.progress.completedLevels).forEach(lvl => {
-                    const type = ge.levels[lvl]?.type;
-                    if (type) typeCounts[type]++;
-                });
-                if (typeCounts.slingshot >= 3) this.unlock('stroop_expert');
-                if (typeCounts.flow >= 3) this.unlock('flow_master');
-                if (typeCounts.gravity >= 3) this.unlock('gravity_defier');
-            }
-        } else {
-            this.stats.totalLosses++;
-            this.stats.currentCombo = 0;
-        }
-        this.save();
-    }
-
-    useSkill() {
-        this.stats.totalSkillsUsed++;
-        if (this.stats.totalSkillsUsed >= 20) this.unlock('skill_spammer');
-        this.save();
-    }
-
-    checkAllDogs() {
-        const ge = window.gameEngine;
-        if (!ge) return;
-        const allUnlocked = Object.values(ge.dogs).every(d => ge.progress.unlockedLevels >= d.unlockLevel);
-        if (allUnlocked) this.unlock('dog_lover');
-    }
+// ===== GAME 1: CARRERA DE CÁLCULO =====
+function juegoCalculo(dif, cb){
+  let streak=0,pts=0,q=0,total=3+dif;
+  const sym={'+':'+','−':'−','×':'×'};
+  function next(){
+    if(gameCancelled){cb(0);return}
+    if(q>=total){cb(pts+streak*2);return}
+    q++;const p=genProb(dif);const o=genOps(p.ans);
+    document.getElementById('panelContenido').innerHTML=`
+      <h2>🧮 Carrera de Cálculo</h2>
+      <div class="sub">${q}/${total} · 🔥${streak}</div>
+      <div class="math">${p.a} <span class="sym">${sym[p.op]}</span> ${p.b} <span class="eq">=</span> ?</div>
+      <div class="timer-bar"><div class="timer-fill" id="ct" style="width:100%"></div></div>
+      <div class="opts" id="co"></div>
+      <div class="msg" id="cm"></div>`;
+    let time=8;const te=document.getElementById('ct');
+    const ti=setInterval(()=>{time-=.1;te.style.width=Math.max(0,(time/8)*100)+'%';if(time<=0){clearInterval(ti);document.getElementById('cm').className='msg bad';document.getElementById('cm').textContent='⏰ Tiempo!';streak=0;setTimeout(next,500)}},100);
+    const box=document.getElementById('co');
+    o.forEach(v=>{const b=document.createElement('div');b.className='opt';b.textContent=v;b.addEventListener('click',()=>{if(b.classList.contains('correct')||b.classList.contains('wrong'))return;clearInterval(ti);if(v===p.ans){streak++;pts+=2+streak;b.classList.add('correct');document.getElementById('cm').className='msg good';document.getElementById('cm').textContent='✅ +'+(2+streak)+'pts';setTimeout(next,400)}else{streak=0;b.classList.add('wrong');document.getElementById('cm').textContent='❌';setTimeout(next,600)}});box.appendChild(b)});
+  }
+  next();
 }
 
-window.achievementManager = new AchievementManager();
-
-// Efectos de confeti
-function createConfetti() {
-    const colors = ['#9d4edd', '#00f5d4', '#ff007f', '#ffee32', '#39ff14', '#ff5400'];
-    for (let i = 0; i < 50; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti';
-        confetti.style.left = Math.random() * 100 + 'vw';
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.width = (Math.random() * 8 + 4) + 'px';
-        confetti.style.height = (Math.random() * 8 + 4) + 'px';
-        confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-        confetti.style.animationDelay = (Math.random() * 0.5) + 's';
-        document.body.appendChild(confetti);
-        setTimeout(() => confetti.remove(), 4000);
-    }
-}
-
-// Efectos ripple
-function createRipple(e, element) {
-    const ripple = document.createElement('div');
-    ripple.className = 'ripple-effect';
-    const rect = element.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    ripple.style.width = ripple.style.height = size + 'px';
-    ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-    ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-    element.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 600);
-}
-
-// Mejorar GameEngine
-function enhanceGameEngine() {
-    if (!window.gameEngine) {
-        setTimeout(enhanceGameEngine, 100);
-        return;
-    }
-
-    const ge = window.gameEngine;
-
-    const origTriggerVictory = ge.triggerVictory.bind(ge);
-    const origTriggerDefeat = ge.triggerDefeat.bind(ge);
-    const origHandleMistake = ge.handleMistake.bind(ge);
-    const origTriggerActiveSkill = ge.triggerActiveSkill.bind(ge);
-    const origSwitchScreen = ge.switchScreen.bind(ge);
-    const origStartLevel = ge.startLevel.bind(ge);
-    const origRenderLevels = ge.renderLevelsMap.bind(ge);
-    const origRenderChars = ge.renderCharacterGrid.bind(ge);
-    const origStartTimer = ge.startTimer.bind(ge);
-
-    ge.triggerVictory = function(scoreStars) {
-        const config = this.levels[this.currentLevelIndex];
-        const timeUsed = config.time - this.timeRemaining;
-        const mistakes = 3 - this.lives;
-
-        createConfetti();
-
-        if (window.achievementManager) {
-            window.achievementManager.checkAfterGame(true, timeUsed, mistakes, config.type);
-        }
-
-        const modal = document.getElementById('modal-victory');
-        if (modal) {
-            const existing = modal.querySelector('.animated-stars');
-            if (!existing) {
-                const starsContainer = document.createElement('div');
-                starsContainer.className = 'animated-stars';
-                starsContainer.style.cssText = 'display:flex;justify-content:center;gap:8px;margin:10px 0;font-size:32px;';
-                for (let i = 0; i < 3; i++) {
-                    const star = document.createElement('span');
-                    star.style.cssText = 'display:inline-block;animation:starSpin 0.6s cubic-bezier(0.175,0.885,0.32,1.275) ' + (i*0.15) + 's both;';
-                    star.textContent = i < scoreStars ? '⭐' : '☆';
-                    starsContainer.appendChild(star);
-                }
-                const msg = modal.querySelector('#victory-message');
-                if (msg) msg.insertAdjacentElement('afterend', starsContainer);
-            }
-        }
-
-        origTriggerVictory(scoreStars);
-    };
-
-    ge.triggerDefeat = function() {
-        const config = this.levels[this.currentLevelIndex];
-        const timeUsed = config.time - this.timeRemaining;
-        const mistakes = 3 - this.lives;
-
-        if (window.achievementManager) {
-            window.achievementManager.checkAfterGame(false, timeUsed, mistakes, config.type);
-        }
-
-        const phoneFrame = document.querySelector('.phone-frame');
-        if (phoneFrame) {
-            phoneFrame.classList.add('error-vibrate');
-            setTimeout(() => phoneFrame.classList.remove('error-vibrate'), 500);
-        }
-
-        origTriggerDefeat();
-    };
-
-    ge.handleMistake = function() {
-        const canvas = document.getElementById('game-canvas');
-        if (canvas) {
-            canvas.classList.add('damage-flash');
-            setTimeout(() => canvas.classList.remove('damage-flash'), 400);
-        }
-        origHandleMistake();
-    };
-
-    ge.triggerActiveSkill = function() {
-        if (window.achievementManager) window.achievementManager.useSkill();
-        origTriggerActiveSkill();
-    };
-
-    ge.switchScreen = function(screenId) {
-        if (screenId === 'screen-achievements') {
-            renderAchievementsScreen();
-        }
-
-        const currentScreen = document.getElementById(this.currentScreen);
-        const targetScreen = document.getElementById(screenId);
-
-        if (currentScreen) {
-            currentScreen.style.opacity = '0';
-            currentScreen.style.transform = 'translateY(-10px)';
-        }
-
-        setTimeout(() => {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            if (targetScreen) {
-                targetScreen.classList.add('active');
-                targetScreen.style.opacity = '0';
-                targetScreen.style.transform = 'translateY(20px)';
-                requestAnimationFrame(() => {
-                    targetScreen.style.opacity = '1';
-                    targetScreen.style.transform = 'translateY(0)';
-                });
-                this.currentScreen = screenId;
-            }
-            if (screenId === 'screen-levels') this.renderLevelsMap();
-            else if (screenId === 'screen-characters') this.renderCharacterGrid();
-        }, 200);
-    };
-
-    ge.startLevel = function(levelNum) {
-        origStartLevel(levelNum);
-        if (window.achievementManager) window.achievementManager.stats.currentCombo = 0;
-
-        const canvas = document.getElementById('game-canvas');
-        if (canvas) {
-            canvas.style.opacity = '0';
-            canvas.style.transform = 'scale(0.95)';
-            canvas.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            setTimeout(() => {
-                canvas.style.opacity = '1';
-                canvas.style.transform = 'scale(1)';
-            }, 300);
-        }
-    };
-
-    ge.renderLevelsMap = function() {
-        origRenderLevels();
-        const nodes = document.querySelectorAll('.level-node');
-        nodes.forEach((node, index) => {
-            const levelNum = index + 1;
-            const level = this.levels[levelNum];
-            if (level) {
-                const typeIcon = level.type === 'slingshot' ? '🎯' : level.type === 'flow' ? '🔗' : '🪐';
-                if (!node.querySelector('.level-type-icon')) {
-                    const badge = document.createElement('div');
-                    badge.className = 'level-type-icon';
-                    badge.style.cssText = 'position:absolute;top:4px;right:4px;font-size:10px;opacity:0.7;';
-                    badge.textContent = typeIcon;
-                    node.appendChild(badge);
-                }
-            }
-        });
-    };
-
-    ge.renderCharacterGrid = function() {
-        origRenderChars();
-        const cards = document.querySelectorAll('.character-card');
-        cards.forEach((card, index) => {
-            const dogKey = Object.keys(this.dogs)[index];
-            if (!dogKey) return;
-            const dog = this.dogs[dogKey];
-            const isUnlocked = this.progress.unlockedLevels >= dog.unlockLevel;
-            if (isUnlocked && !card.querySelector('.skill-indicator')) {
-                const indicator = document.createElement('div');
-                indicator.className = 'skill-indicator';
-                indicator.style.cssText = 'position:absolute;bottom:2px;right:2px;font-size:8px;background:rgba(0,245,212,0.2);color:var(--secondary);padding:1px 4px;border-radius:4px;font-weight:700;';
-                indicator.textContent = '✦';
-                card.appendChild(indicator);
-            }
-        });
-    };
-
-    ge.startTimer = function() {
-        origStartTimer();
-        const timerEl = document.getElementById('game-timer');
-        if (timerEl) {
-            const checkWarning = setInterval(() => {
-                if (!this.timerInterval) {
-                    clearInterval(checkWarning);
-                    timerEl.classList.remove('warning');
-                    return;
-                }
-                if (this.timeRemaining <= 10) timerEl.classList.add('warning');
-                else timerEl.classList.remove('warning');
-            }, 500);
-        }
-    };
-
-    document.querySelectorAll('button, .level-node, .character-card').forEach(el => {
-        el.addEventListener('click', function(e) {
-            createRipple(e, this);
-        });
+// ===== GAME 2: GRID =====
+function juegoGrid(dif, cb){
+  const op='+';let nums=[],tgt=rand(6,20),sel=null,matched=0,pts=0;
+  for(let i=0;i<8;i++){let a=rand(1,tgt-1);nums.push(a,tgt-a)}
+  for(let i=nums.length-1;i>0;i--){const j=rand(0,i);[nums[i],nums[j]]=[nums[j],nums[i]]}
+  function rend(){
+    document.getElementById('panelContenido').innerHTML=`
+      <h2>⊞ Grid Numérico</h2>
+      <div class="sub">Pares que <b>sumen</b> <b style="color:var(--gold);font-size:18px">${tgt}</b></div>
+      <div class="grid-4" id="gb"></div>
+      <div class="msg" id="gm">${matched}/8</div>`;
+    const box=document.getElementById('gb');
+    nums.forEach((v,i)=>{
+      if(v===null)return;
+      const d=document.createElement('div');d.className='gcell';d.textContent=v;
+      d.addEventListener('click',()=>{
+        if(gameCancelled)return;
+        if(d.classList.contains('ok'))return;
+        if(sel===null){d.classList.add('sel');sel=i;return}
+        if(sel===i){d.classList.remove('sel');sel=null;return}
+        const fi=sel,fd=box.children[fi],v1=nums[fi],v2=v;
+        if(v1+v2===tgt){fd.classList.remove('sel');fd.classList.add('ok');d.classList.add('ok');nums[fi]=null;nums[i]=null;matched++;pts+=3;document.getElementById('gm').textContent=`${matched}/8 ✅`;sel=null;if(matched>=8){document.getElementById('gm').textContent='🎉 Completado!';setTimeout(()=>cb(pts),400)}}else{fd.classList.remove('sel');fd.classList.add('bad');d.classList.add('bad');document.getElementById('gm').textContent='❌';setTimeout(()=>{fd.classList.remove('bad');d.classList.remove('bad')},400);sel=null}
+      });
+      box.appendChild(d);
     });
-
-    setTimeout(() => {
-        if (window.achievementManager) window.achievementManager.checkAllDogs();
-    }, 1000);
-
-    console.log('✅ Mental Paws mejorado cargado');
+  }
+  rend();
 }
 
-function renderAchievementsScreen() {
-    const container = document.getElementById('achievements-list');
-    const statsContainer = document.getElementById('achievement-stats');
+// ===== GAME 3: MEMORIA =====
+function juegoMemoria(dif, cb){
+  const len=3+dif;const seq=[];for(let i=0;i<len;i++)seq.push(rand(1,9));
+  let qIdx=0,lives=3,pts=0;
+  const qs=[];
+  const pi=rand(0,len-1);qs.push({t:`En la secuencia, ¿cuál estaba en la posición <b>#${pi+1}</b>?`,a:seq[pi]});
+  const ev=seq.filter(x=>x%2===0);qs.push({t:`Suma de números <b>pares</b>?`,a:ev.reduce((a,b)=>a+b,0)});
+  qs.push({t:`¿<b>${seq[0]} × ${seq[len-1]}</b> (primero × último)?`,a:seq[0]*seq[len-1]});
 
-    if (!container || !window.achievementManager) return;
-
-    const am = window.achievementManager;
-    const achievements = am.achievements;
-    const stats = am.stats;
-
-    container.innerHTML = '';
-    Object.keys(achievements).forEach(key => {
-        const ach = achievements[key];
-        const card = document.createElement('div');
-        card.className = 'achievement-card ' + (ach.unlocked ? 'unlocked' : '');
-        card.innerHTML = `
-            <div class="achievement-icon">${ach.icon}</div>
-            <div class="achievement-info">
-                <div class="achievement-name">${ach.name}</div>
-                <div class="achievement-desc">${ach.desc}</div>
-            </div>
-            <div class="achievement-status">${ach.unlocked ? '✓' : '🔒'}</div>
-        `;
-        container.appendChild(card);
+  function showSeq(){
+    document.getElementById('panelContenido').innerHTML=`
+      <h2>⟳ Memoria Numérica</h2>
+      <div class="sub">Memorizá el orden. Luego te preguntaré: "En la secuencia, ¿cuál estaba en la posición #3?"</div>
+      <div class="seq-row" id="sr"></div>
+      <button class="btn gold" id="btnListo" style="margin-top:8px">✓ Listo</button>`;
+    const row=document.getElementById('sr');
+    seq.forEach((n,i)=>{const d=document.createElement('div');d.className='snum';d.textContent=n;d.style.animationDelay=i*60+'ms';row.appendChild(d)});
+    document.getElementById('btnListo').addEventListener('click',()=>{
+      document.querySelectorAll('.snum').forEach((d,i)=>{setTimeout(()=>d.classList.add('hide'),i*40+40)});
+      setTimeout(showQ,seq.length*40+300);
     });
-
-    statsContainer.innerHTML = `
-        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:8px;">
-            <div style="font-size:20px;font-weight:800;color:var(--secondary);">${stats.totalWins}</div>
-            <div style="font-size:10px;color:var(--text-muted);">Victorias</div>
-        </div>
-        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:8px;">
-            <div style="font-size:20px;font-weight:800;color:var(--accent);">${stats.totalGames - stats.totalWins}</div>
-            <div style="font-size:10px;color:var(--text-muted);">Derrotas</div>
-        </div>
-        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:8px;">
-            <div style="font-size:20px;font-weight:800;color:var(--yellow);">${stats.maxCombo}</div>
-            <div style="font-size:10px;color:var(--text-muted);">Combo Máx</div>
-        </div>
-        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:8px;">
-            <div style="font-size:20px;font-weight:800;color:var(--primary);">${Object.values(achievements).filter(a=>a.unlocked).length}/${Object.keys(achievements).length}</div>
-            <div style="font-size:10px;color:var(--text-muted);">Logros</div>
-        </div>
-    `;
+  }
+  function showQ(){
+    if(gameCancelled){cb(0);return}
+    if(lives<=0||qIdx>=qs.length){const w=qIdx>=qs.length;document.getElementById('overlay').classList.remove('show');if(w){pts+=5;toast('🧠 +'+pts+' ⭐!');cb(pts)}else{toast('💔 Memoria fallida');cb(0)}return}
+    const q=qs[qIdx],o=genOps(q.a);
+    document.getElementById('panelContenido').innerHTML=`
+      <h2>⟳ Memoria</h2>
+      <div class="sub">${'❤'.repeat(lives)}</div>
+      <p style="font-size:16px;font-weight:700;margin:8px 0">${q.t}</p>
+      <div class="opts" id="mo"></div>
+      <div class="msg" id="mm">${qIdx+1}/${qs.length}</div>`;
+    const box=document.getElementById('mo');
+    o.forEach(v=>{const b=document.createElement('div');b.className='opt';b.textContent=v;b.addEventListener('click',()=>{if(b.classList.contains('correct')||b.classList.contains('wrong'))return;if(v===q.a){b.classList.add('correct');qIdx++;pts+=3;document.getElementById('mm').className='msg good';document.getElementById('mm').textContent='✅';setTimeout(showQ,500)}else{lives--;b.classList.add('wrong');document.getElementById('mm').textContent=lives>0?'❌ Quedan '+lives:'💀';setTimeout(()=>{if(lives<=0){document.getElementById('overlay').classList.remove('show');toast('💔 Sin vidas');cb(0)}else showQ()},700)}});box.appendChild(b)});
+  }
+  showSeq();
 }
 
-function addMenuBackgroundEffects() {
-    const mainMenu = document.getElementById('screen-main-menu');
-    if (!mainMenu) return;
-    for (let i = 0; i < 15; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'bg-particle';
-        particle.style.cssText = 'left:' + (Math.random()*100) + '%;top:' + (Math.random()*100) + '%;width:' + (Math.random()*4+2) + 'px;height:' + (Math.random()*4+2) + 'px;background:' + (['#9d4edd','#00f5d4','#ff007f','#ffee32'][Math.floor(Math.random()*4)]) + ';animation-delay:' + (Math.random()*8) + 's;animation-duration:' + (6+Math.random()*4) + 's;';
-        mainMenu.appendChild(particle);
-    }
+// ===== GAME 4: CUENTA OVEJAS =====
+function juegoOvejas(dif, cb){
+  const total=5;let ronda=0,pts=0;
+  function sub(){
+    if(gameCancelled){cb(0);return}
+    if(ronda>=total){cb(pts+5);return}
+    const n=rand(8+dif*3,25+dif*8);
+    const s=rand(1,Math.min(9,Math.floor(n/2)));
+    const ans=n-s;ronda++;
+    const o=genOps(ans);
+    document.getElementById('panelContenido').innerHTML=`
+      <h2>🐑 Cuenta Ovejas</h2>
+      <div class="sub">Hacé dormir a tu mascota 🐣💤 <span style="margin-left:6px">${ronda}/${total}</span></div>
+      <div style="font-size:52px;margin:4px 0">🐑</div>
+      <div class="math">${n} <span class="sym">−</span> ${s} <span class="eq">=</span> ?</div>
+      <div class="opts" id="o4"></div>
+      <div class="msg" id="m4">🐑 Oveja ${ronda-1} saltó!</div>`;
+    const box=document.getElementById('o4');
+    o.forEach(v=>{const b=document.createElement('div');b.className='opt';b.textContent=v;b.addEventListener('click',()=>{if(b.classList.contains('correct')||b.classList.contains('wrong'))return;if(v===ans){pts+=3;b.classList.add('correct');document.getElementById('m4').className='msg good';document.getElementById('m4').textContent='🐑 Saltó!';setTimeout(sub,400)}else{b.classList.add('wrong');document.getElementById('m4').className='msg bad';document.getElementById('m4').textContent='😴 Se asustó...';setTimeout(sub,700)}});box.appendChild(b)});
+  }
+  sub();
 }
 
-setTimeout(() => {
-    enhanceGameEngine();
-    addMenuBackgroundEffects();
+// ===== LAUNCHER =====
+function abrirJuego(tipo){
+  gameCancelled=false;
+  document.getElementById('overlay').classList.add('show');
+  const dif=calcularDif();
+  document.getElementById('panelContenido').innerHTML=`
+    <h2>Cargando...</h2>
+    <div class="msg">🐣</div>`;
+  setTimeout(()=>{
+  if(gameCancelled)return;
+  if(tipo==='calculo'){
+    juegoCalculo(dif,(pts)=>{
+      document.getElementById('overlay').classList.remove('show');
+      if(pts>0){recompensar('calculo',pts);toast('🍖 +'+pts+' de comida!')}
+      else toast('😞 Sin puntos esta vez');
+    });
+  }else if(tipo==='grid'){
+    juegoGrid(dif,(pts)=>{
+      document.getElementById('overlay').classList.remove('show');
+      if(pts>0){recompensar('grid',pts);toast('😊 +'+pts+' de felicidad!')}
+      else toast('😞 Sin puntos esta vez');
+    });
+  }else if(tipo==='memoria'){
+    juegoMemoria(dif,(pts)=>{
+      document.getElementById('overlay').classList.remove('show');
+      if(pts>0){recompensar('memoria',pts);toast('⚡ +'+pts+' de energía!')}
+      else toast('😞 Sin puntos esta vez');
+    });
+  }else if(tipo==='ovejas'){
+    juegoOvejas(dif,(pts)=>{
+      document.getElementById('overlay').classList.remove('show');
+      if(pts>0){recompensar('ovejas',pts);explosionZzz()}
+      else toast('😞 Sin puntos esta vez');
+    });
+  }
+  }, 200);
+}
 
-}, 500);
+function cancelarJuego(){
+  gameCancelled=true;
+  document.getElementById('overlay').classList.remove('show');
+}
+function explosionZzz(){
+  const e=document.getElementById('petEmoji');
+  e.textContent='😴';e.style.animation='none';
+  setTimeout(()=>{e.style.animation='bob 1.2s ease-in-out infinite';actualizarMascota()},1200);
+  toast('💤 Zzz... '+pet.energia.toFixed(0)+' de energía!');
+  // pausa el decaimiento por 8s
+  pet._sleep=8;
+}
+function mostrarInstrucciones(){
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('panelContenido').innerHTML=`
+    <h2>❓ ¿Cómo se juega?</h2>
+    <div class="sub" style="font-size:12px;text-align:left;line-height:1.6">
+    <b style="color:var(--teal)">🐣 Tu mascota</b><br>
+    Tiene <b>4 estadísticas</b> que bajan con el tiempo:<br>
+    🍖 Hambre · 😊 Felicidad · ⚡ Energía · ❤️ Salud<br>
+    Si el hambre o la energía llegan a 0, la salud empieza a caer.<br><br>
+
+    <b style="color:var(--teal)">🧮 Los juegos</b><br>
+    Cada juego matemático recarga una estadística distinta:<br>
+    <b>• Carrera 🧮</b> → 🍖 Hambre<br>
+    &nbsp;&nbsp;Resolvé operaciones (+, −, ×) contra reloj.<br>
+    <b>• Grid ⊞</b> → 😊 Felicidad<br>
+    &nbsp;&nbsp;Encontrá pares de números que sumen el objetivo.<br>
+    <b>• Memoria ⟳</b> → ⚡ Energía<br>
+    &nbsp;&nbsp;Aparecen números en orden. Memoralos, luego<br>
+    &nbsp;&nbsp;presioná "Listo" y respondé preguntas como<br>
+    &nbsp;&nbsp;"¿cuál estaba en la posición #3?" o "suma de pares".<br>
+    <b>• Ovejas 🐑</b> → 💤 Sueño (energía + pausa decaimiento)<br>
+    &nbsp;&nbsp;Restá números para que las ovejas salten y<br>
+    &nbsp;&nbsp;tu mascota se duerma profundamente.<br><br>
+
+    <b style="color:var(--teal)">⬆️ Niveles</b><br>
+    Cada juego te da <b>XP</b>. Al subir de nivel:<br>
+    • La dificultad de los juegos aumenta.<br>
+    • Tus recompensas valen <b>más</b> (multiplicador).<br>
+    Ganás estrellas que hacen evolucionar a tu<br>
+    mascota: 🐣→🐤→🐔→🦅→🦉<br><br>
+
+    <b style="color:var(--teal)">💡 Consejo</b><br>
+    No dejes que las barras lleguen a 0.<br>
+    Alterná los 4 juegos para mantenerla saludable.<br>
+    </div>
+    <button class="btn" onclick="document.getElementById('overlay').classList.remove('show')">Cerrar</button>`;
+}
+
+actualizarMascota();
 </script>
 </body>
 </html>
