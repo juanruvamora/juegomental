@@ -99,6 +99,38 @@ h1,h2,h3{font-family:'Baloo 2',sans-serif}
 /* CLOSE X */
 .close-x{position:absolute;top:-10px;right:-10px;font-size:22px;font-weight:800;cursor:pointer;color:#fff;background:var(--red);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:15;box-shadow:0 2px 6px rgba(0,0,0,.4);transition:transform .1s}
 .close-x:hover{transform:scale(1.15)}
+
+/* META + HUD ROW */
+.hud-row{display:flex;align-items:center;gap:6px;margin:2px 0 6px}
+.hud-chip{background:var(--paper);border:2px solid var(--ink);border-radius:20px;padding:2px 10px;font-weight:800;font-size:11px;display:flex;align-items:center;gap:4px;font-family:'Baloo 2'}
+.hud-chip.racha{color:var(--red)}
+.hud-chip.vidas span{color:var(--red)}
+.hud-chip.meta{flex:1}
+.hud-chip.meta .m-wrap{flex:1;height:8px;background:#ddd0ad;border-radius:4px;overflow:hidden}
+.hud-chip.meta .m-fill{height:100%;background:linear-gradient(90deg,#8fd19e,var(--gold));border-radius:4px;transition:width .3s}
+.hud-btn{cursor:pointer;border:2px solid var(--ink);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:15px;background:var(--paper);transition:transform .1s}
+.hud-btn:active{transform:scale(.9)}
+.hud-btn.disabled{opacity:.35;pointer-events:none}
+
+/* EVENTO ESTRELLA */
+#eventoStar{position:absolute;top:2px;left:50%;margin-left:-14px;font-size:28px;cursor:pointer;display:none;animation:pulseStar 1s ease-in-out infinite;filter:drop-shadow(0 0 6px var(--gold));z-index:5}
+@keyframes pulseStar{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+#eventoBadge{position:absolute;top:2px;left:50%;margin-left:-20px;background:var(--gold);border:2px solid var(--ink);border-radius:16px;padding:2px 8px;font-weight:800;font-size:11px;display:none;z-index:5;font-family:'Baloo 2'}
+
+/* BURBUJA DE MASCOTA */
+#petBubble{position:absolute;top:-18px;right:4px;background:var(--white-paper);border:2px solid var(--ink);border-radius:12px;padding:4px 10px;font-size:11px;font-weight:800;box-shadow:0 3px 8px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;pointer-events:none;z-index:6;max-width:170px}
+#petBubble::after{content:'';position:absolute;bottom:-8px;left:14px;border:6px solid transparent;border-top:6px solid var(--ink);border-bottom:0}
+
+/* WHEEL */
+.rueda-circle{width:190px;height:190px;border-radius:50%;position:relative;margin:10px auto;border:5px solid var(--ink);box-shadow:0 4px 10px rgba(0,0,0,.25);transition:transform 3.2s cubic-bezier(.15,.7,.2,1)}
+.rueda-ptr{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:24px;color:var(--red);z-index:3;text-shadow:0 2px 3px rgba(0,0,0,.3)}
+.rueda-sector{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.rueda-sector span{transform:translateY(-66px);font-size:26px}
+
+/* LOGROS */
+.logro-item{display:flex;align-items:center;gap:8px;background:var(--paper);border:2px solid var(--ink);border-radius:10px;padding:6px 10px;margin:4px 0;font-size:12px;font-weight:800}
+.logro-item.locked{opacity:.4;filter:grayscale(1)}
+
 /* TOAST */
 #toast{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--white-paper);padding:4px 14px;font-weight:800;font-family:'Baloo 2';z-index:20;opacity:0;transition:opacity .3s;pointer-events:none;border-radius:6px;font-size:12px}
 @media(max-width:420px){
@@ -126,13 +158,27 @@ h1,h2,h3{font-family:'Baloo 2',sans-serif}
 <div id="game-wrap">
   <div class="top-bar">
     <h1>📐 Mascota Matemática</h1>
-    <span><span class="star-count">⭐ <span id="totalStars">0</span></span><span style="cursor:pointer;margin-left:8px;font-size:18px;font-weight:800;color:var(--teal)" onclick="mostrarInstrucciones()" title="¿Cómo se juega?">❓</span></span>
+    <span>
+      <span class="star-count">⭐ <span id="totalStars">0</span></span>
+      <span class="hud-btn" style="margin-left:6px" onclick="abrirLogros()" title="Logros">🏆</span>
+      <span class="hud-btn" id="btnRueda" onclick="abrirRueda()" title="Recompensa diaria">🎡</span>
+      <span class="hud-btn" style="margin-left:6px" onclick="mostrarInstrucciones()" title="¿Cómo se juega?">❓</span>
+    </span>
   </div>
 
   <div class="pet-area">
+    <span id="eventoStar" onclick="activarEvento()">✨</span>
+    <span id="eventoBadge"></span>
+    <div id="petBubble"></div>
     <span class="pet-emoji" id="petEmoji">🐣</span>
     <div class="pet-name" id="petName">Bebé Matemático</div>
     <div class="pet-mood" id="petMood">Resolvé desafíos para cuidarme</div>
+  </div>
+
+  <div class="hud-row">
+    <span class="hud-chip racha" id="chipRacha" style="display:none">🔥 <span id="rachaN">0</span></span>
+    <span class="hud-chip vidas">❤️ <span id="vidasN">3</span></span>
+    <span class="hud-chip meta">🎯 <div class="m-wrap"><div class="m-fill" id="metaFill" style="width:0%"></div></div></span>
   </div>
 
   <div class="level-bar">
@@ -184,11 +230,70 @@ h1,h2,h3{font-family:'Baloo 2',sans-serif}
 <script>
 // ===== PET =====
 let gameCancelled=false;
-const pet={hambre:70,felicidad:60,energia:80,salud:90,edad:0,estrellas:0,racha:0,_sleep:0,nivel:1,xp:0};
+const pet={hambre:70,felicidad:60,energia:80,salud:90,edad:0,estrellas:0,racha:0,_sleep:0,nivel:1,xp:0,vidas:3,vidasT:Date.now(),xpHoy:0,metaHoy:150,fechaHoy:'',logros:[],juegos:0,juegosPor:{},ultimoEvento:Date.now(),eventoActivo:false,eventoFin:0,lastVisit:Date.now(),ruedaDia:false};
 const emojis=['🐣','🐤','🐔','🦅','🦉'];
+function today(){return new Date().toDateString()}
 function xpMax(){return 80+(pet.nivel-1)*40}
 function calcularDif(){return Math.min(4,Math.floor((pet.nivel-1)/2))}
 function multiplicador(){return 1+(pet.nivel-1)*0.5}
+
+// ===== GUARDAR / CARGAR =====
+function guardar(){
+  try{localStorage.setItem('mascotaMath',JSON.stringify(pet))}catch(e){}
+}
+function cargar(){
+  try{
+    const d=JSON.parse(localStorage.getItem('mascotaMath'));
+    if(!d)return;
+    Object.assign(pet,d);
+    pet._sleep=0;
+    pet.ultimoEvento=Date.now();
+    if(pet.fechaHoy!==today()){pet.xpHoy=0;pet.ruedaDia=false;pet.fechaHoy=today();}
+  }catch(e){}
+  regenerarVidas();
+}
+function regenerarVidas(){
+  const now=Date.now();
+  if(pet.vidas<3){
+    const ganadas=Math.floor((now-pet.vidasT)/120000);
+    if(ganadas>0){pet.vidas=Math.min(3,pet.vidas+ganadas);pet.vidasT=now;}
+  }
+}
+
+// ===== BURBUJA / AVISOS =====
+let bubbleT=null;
+function avisar(m,ms=3200){
+  const b=document.getElementById('petBubble');
+  b.textContent=m;b.style.opacity=1;
+  clearTimeout(bubbleT);
+  bubbleT=setTimeout(()=>b.style.opacity=0,ms);
+}
+
+// ===== RACHA =====
+function sumarRacha(){
+  pet.racha++;
+  actualizarMascota();
+  if(pet.racha===5){toast('🔥 ¡Racha 5! Bonus x2');}
+}
+function resetRacha(){pet.racha=0;actualizarMascota()}
+function rachaMult(){return pet.racha>=5?2:1}
+
+// ===== EVENTO DOBLE XP =====
+function activarEvento(){
+  if(pet.eventoActivo)return;
+  pet.eventoActivo=true;pet.eventoFin=Date.now()+60000;
+  document.getElementById('eventoStar').style.display='none';
+  document.getElementById('eventoBadge').style.display='block';
+  toast('✨ ¡Doble XP por 60 segundos!');
+}
+function eventoMult(){return pet.eventoActivo?2:1}
+function spawnEvento(){
+  if(pet.eventoActivo)return;
+  if(document.getElementById('eventoStar').style.display==='block')return;
+  if(Date.now()-pet.ultimoEvento<180000)return;
+  document.getElementById('eventoStar').style.display='block';
+  avisar('✨ Toca la estrella para doble XP!');
+}
 function obtenerEmoji(){
   if(pet.salud<15)return '😷';
   if(pet.energia<10)return '😴';
@@ -214,6 +319,19 @@ function actualizarMascota(){
   document.getElementById('lvXp').textContent=pet.xp+'/'+xpMax();
   document.getElementById('lvFill').style.width=Math.min(100,(pet.xp/xpMax())*100)+'%';
 
+  // vidas
+  regenerarVidas();
+  document.getElementById('vidasN').textContent=pet.vidas;
+  // racha
+  const chip=document.getElementById('chipRacha');
+  chip.style.display=pet.racha>=2?'flex':'none';
+  document.getElementById('rachaN').textContent=pet.racha;
+  // meta diaria
+  const mf=document.getElementById('metaFill');
+  mf.style.width=Math.min(100,(pet.xpHoy/pet.metaHoy)*100)+'%';
+  document.getElementById('btnRueda').classList.toggle('disabled',pet.xpHoy<pet.metaHoy);
+  if(pet.xpHoy>=pet.metaHoy&&!pet.ruedaDia){toast('🎡 ¡Meta diaria cumplida! Abrí la rueda');}
+
   let mood='😊 Feliz y saludable';
   if(pet.hambre<20)mood='😫 Mucha hambre!';
   else if(pet.felicidad<20)mood='😞 Triste... jugá conmigo';
@@ -223,14 +341,33 @@ function actualizarMascota(){
 }
 
 function ganarXP(cant){
-  pet.xp+=cant;
+  const total=Math.round(cant*eventoMult());
+  pet.xp+=total;
+  pet.xpHoy+=total;
   while(pet.xp>=xpMax()){
     pet.xp-=xpMax();
     pet.nivel++;
     const d=calcularDif();
     toast('⬆️ ¡Nivel '+pet.nivel+'! Dificultad '+(d+1));
+    guardar();
   }
+  chequearLogros();
   actualizarMascota();
+}
+
+// ===== LOGROS =====
+const LOGROS=[
+  {id:'primera',icon:'🎮',nombre:'Primer paso',ok:()=>pet.juegos>=1},
+  {id:'racha5',icon:'🔥',nombre:'Racha de 5',ok:()=>pet.racha>=5},
+  {id:'nivel3',icon:'⬆️',nombre:'Subiendo fuerte',ok:()=>pet.nivel>=3},
+  {id:'estrellas50',icon:'⭐',nombre:'Coleccionista',ok:()=>pet.estrellas>=50},
+  {id:'todos',icon:'🧠',nombre:'Versátil',ok:()=>pet.juegosPor.calculo&&pet.juegosPor.grid&&pet.juegosPor.memoria&&pet.juegosPor.ovejas},
+  {id:'meta1',icon:'🎯',nombre:'Metido',ok:()=>pet.ruedaLista}
+];
+function chequearLogros(){
+  let nuevo=false;
+  LOGROS.forEach(l=>{if(!pet.logros.includes(l.id)&&l.ok()){pet.logros.push(l.id);toast('🏆 Logro: '+l.icon+' '+l.nombre);nuevo=true;guardar()}});
+  return nuevo;
 }
 
 // Decaimiento cada 4 segundos
@@ -254,7 +391,7 @@ function toast(m){
 }
 
 function recompensar(tipo,puntos){
-  const mult=multiplicador();
+  const mult=multiplicador()*rachaMult()*eventoMult();
   const p=Math.round(puntos*mult);
   if(tipo==='calculo'){pet.hambre=Math.min(100,pet.hambre+p);pet.energia=Math.max(0,pet.energia-p*.3)}
   if(tipo==='grid'){pet.felicidad=Math.min(100,pet.felicidad+p);pet.salud=Math.min(100,pet.salud+p*.2)}
@@ -262,6 +399,7 @@ function recompensar(tipo,puntos){
   if(tipo==='ovejas'){pet.energia=Math.min(100,pet.energia+p*2);pet.salud=Math.min(100,pet.salud+p*.3)}
   pet.estrellas+=Math.ceil(p/5);
   ganarXP(puntos*2);
+  guardar();
 }
 
 // ===== MATH HELPERS =====
@@ -286,18 +424,18 @@ function juegoCalculo(dif, cb){
   function next(){
     if(gameCancelled){cb(0);return}
     if(q>=total){cb(pts+streak*2);return}
-    q++;const p=genProb(dif);const o=genOps(p.ans);
+    q++;const p=genProb(dif);const o=genOps(p.ans);const last=q===total;
     document.getElementById('panelContenido').innerHTML=`
       <h2>🧮 Carrera de Cálculo</h2>
-      <div class="sub">${q}/${total} · 🔥${streak}</div>
+      <div class="sub">${q}/${total} · 🔥${streak}${last?' · <b style="color:var(--gold)">ÚLTIMA x2!</b>':''}</div>
       <div class="math">${p.a} <span class="sym">${sym[p.op]}</span> ${p.b} <span class="eq">=</span> ?</div>
       <div class="timer-bar"><div class="timer-fill" id="ct" style="width:100%"></div></div>
       <div class="opts" id="co"></div>
       <div class="msg" id="cm"></div>`;
     let time=8;const te=document.getElementById('ct');
-    const ti=setInterval(()=>{time-=.1;te.style.width=Math.max(0,(time/8)*100)+'%';if(time<=0){clearInterval(ti);document.getElementById('cm').className='msg bad';document.getElementById('cm').textContent='⏰ Tiempo!';streak=0;setTimeout(next,500)}},100);
+    const ti=setInterval(()=>{time-=.1;te.style.width=Math.max(0,(time/8)*100)+'%';if(time<=0){clearInterval(ti);document.getElementById('cm').className='msg bad';document.getElementById('cm').textContent='⏰ Tiempo!';streak=0;resetRacha();setTimeout(next,500)}},100);
     const box=document.getElementById('co');
-    o.forEach(v=>{const b=document.createElement('div');b.className='opt';b.textContent=v;b.addEventListener('click',()=>{if(b.classList.contains('correct')||b.classList.contains('wrong'))return;clearInterval(ti);if(v===p.ans){streak++;pts+=2+streak;b.classList.add('correct');document.getElementById('cm').className='msg good';document.getElementById('cm').textContent='✅ +'+(2+streak)+'pts';setTimeout(next,400)}else{streak=0;b.classList.add('wrong');document.getElementById('cm').textContent='❌';setTimeout(next,600)}});box.appendChild(b)});
+    o.forEach(v=>{const b=document.createElement('div');b.className='opt';b.textContent=v;b.addEventListener('click',()=>{if(b.classList.contains('correct')||b.classList.contains('wrong'))return;clearInterval(ti);if(v===p.ans){const g=2+streak;streak++;sumarRacha();pts+=(last?g*2:g);b.classList.add('correct');document.getElementById('cm').className='msg good';document.getElementById('cm').textContent='✅ +'+(last?g*2:g)+'pts';setTimeout(next,400)}else{streak=0;resetRacha();b.classList.add('wrong');document.getElementById('cm').textContent='❌';setTimeout(next,600)}});box.appendChild(b)});
   }
   next();
 }
@@ -323,7 +461,7 @@ function juegoGrid(dif, cb){
         if(sel===null){d.classList.add('sel');sel=i;return}
         if(sel===i){d.classList.remove('sel');sel=null;return}
         const fi=sel,fd=box.children[fi],v1=nums[fi],v2=v;
-        if(v1+v2===tgt){fd.classList.remove('sel');fd.classList.add('ok');d.classList.add('ok');nums[fi]=null;nums[i]=null;matched++;pts+=3;document.getElementById('gm').textContent=`${matched}/8 ✅`;sel=null;if(matched>=8){document.getElementById('gm').textContent='🎉 Completado!';setTimeout(()=>cb(pts),400)}}else{fd.classList.remove('sel');fd.classList.add('bad');d.classList.add('bad');document.getElementById('gm').textContent='❌';setTimeout(()=>{fd.classList.remove('bad');d.classList.remove('bad')},400);sel=null}
+        if(v1+v2===tgt){fd.classList.remove('sel');fd.classList.add('ok');d.classList.add('ok');nums[fi]=null;nums[i]=null;matched++;pts+=3;sumarRacha();document.getElementById('gm').textContent=`${matched}/8 ✅`;sel=null;if(matched>=8){document.getElementById('gm').textContent='🎉 Completado! +20';setTimeout(()=>cb(pts+20),400)}}else{resetRacha();fd.classList.remove('sel');fd.classList.add('bad');d.classList.add('bad');document.getElementById('gm').textContent='❌';setTimeout(()=>{fd.classList.remove('bad');d.classList.remove('bad')},400);sel=null}
       });
       box.appendChild(d);
     });
@@ -355,16 +493,16 @@ function juegoMemoria(dif, cb){
   }
   function showQ(){
     if(gameCancelled){cb(0);return}
-    if(lives<=0||qIdx>=qs.length){const w=qIdx>=qs.length;document.getElementById('overlay').classList.remove('show');if(w){pts+=5;toast('🧠 +'+pts+' ⭐!');cb(pts)}else{toast('💔 Memoria fallida');cb(0)}return}
-    const q=qs[qIdx],o=genOps(q.a);
+    if(lives<=0||qIdx>=qs.length){const w=qIdx>=qs.length;document.getElementById('overlay').classList.remove('show');if(w){pts+=5;toast('🧠 +'+pts+' ⭐!');cb(pts)}else{resetRacha();toast('💔 Memoria fallida');cb(0)}return}
+    const q=qs[qIdx],o=genOps(q.a);const last=qIdx===qs.length-1;
     document.getElementById('panelContenido').innerHTML=`
       <h2>⟳ Memoria</h2>
-      <div class="sub">${'❤'.repeat(lives)}</div>
+      <div class="sub">${'❤'.repeat(lives)}${last?' · <b style="color:var(--gold)">ÚLTIMA x2!</b>':''}</div>
       <p style="font-size:16px;font-weight:700;margin:8px 0">${q.t}</p>
       <div class="opts" id="mo"></div>
       <div class="msg" id="mm">${qIdx+1}/${qs.length}</div>`;
     const box=document.getElementById('mo');
-    o.forEach(v=>{const b=document.createElement('div');b.className='opt';b.textContent=v;b.addEventListener('click',()=>{if(b.classList.contains('correct')||b.classList.contains('wrong'))return;if(v===q.a){b.classList.add('correct');qIdx++;pts+=3;document.getElementById('mm').className='msg good';document.getElementById('mm').textContent='✅';setTimeout(showQ,500)}else{lives--;b.classList.add('wrong');document.getElementById('mm').textContent=lives>0?'❌ Quedan '+lives:'💀';setTimeout(()=>{if(lives<=0){document.getElementById('overlay').classList.remove('show');toast('💔 Sin vidas');cb(0)}else showQ()},700)}});box.appendChild(b)});
+    o.forEach(v=>{const b=document.createElement('div');b.className='opt';b.textContent=v;b.addEventListener('click',()=>{if(b.classList.contains('correct')||b.classList.contains('wrong'))return;if(v===q.a){b.classList.add('correct');qIdx++;sumarRacha();pts+=last?6:3;document.getElementById('mm').className='msg good';document.getElementById('mm').textContent='✅ +'+(last?6:3);setTimeout(showQ,500)}else{lives--;resetRacha();b.classList.add('wrong');document.getElementById('mm').textContent=lives>0?'❌ Quedan '+lives:'💀';setTimeout(()=>{if(lives<=0){document.getElementById('overlay').classList.remove('show');toast('💔 Sin vidas');cb(0)}else showQ()},700)}});box.appendChild(b)});
   }
   showSeq();
 }
@@ -377,55 +515,58 @@ function juegoOvejas(dif, cb){
     if(ronda>=total){cb(pts+5);return}
     const n=rand(8+dif*3,25+dif*8);
     const s=rand(1,Math.min(9,Math.floor(n/2)));
-    const ans=n-s;ronda++;
+    const ans=n-s;ronda++;const last=ronda===total;
     const o=genOps(ans);
     document.getElementById('panelContenido').innerHTML=`
       <h2>🐑 Cuenta Ovejas</h2>
-      <div class="sub">Hacé dormir a tu mascota 🐣💤 <span style="margin-left:6px">${ronda}/${total}</span></div>
+      <div class="sub">¡Rápido, la oveja se va a dormir! <span style="margin-left:6px">${ronda}/${total}</span>${last?' · <b style="color:var(--gold)">ÚLTIMA x2!</b>':''}</div>
       <div style="font-size:52px;margin:4px 0">🐑</div>
       <div class="math">${n} <span class="sym">−</span> ${s} <span class="eq">=</span> ?</div>
+      <div class="timer-bar"><div class="timer-fill" id="ot" style="width:100%"></div></div>
       <div class="opts" id="o4"></div>
       <div class="msg" id="m4">🐑 Oveja ${ronda-1} saltó!</div>`;
+    let time=8;const te=document.getElementById('ot');
+    const ti=setInterval(()=>{time-=.1;te.style.width=Math.max(0,(time/8)*100)+'%';if(time<=0){clearInterval(ti);document.getElementById('m4').className='msg bad';document.getElementById('m4').textContent='💨 Se escapó!';resetRacha();setTimeout(sub,600)}},100);
     const box=document.getElementById('o4');
-    o.forEach(v=>{const b=document.createElement('div');b.className='opt';b.textContent=v;b.addEventListener('click',()=>{if(b.classList.contains('correct')||b.classList.contains('wrong'))return;if(v===ans){pts+=3;b.classList.add('correct');document.getElementById('m4').className='msg good';document.getElementById('m4').textContent='🐑 Saltó!';setTimeout(sub,400)}else{b.classList.add('wrong');document.getElementById('m4').className='msg bad';document.getElementById('m4').textContent='😴 Se asustó...';setTimeout(sub,700)}});box.appendChild(b)});
+    o.forEach(v=>{const b=document.createElement('div');b.className='opt';b.textContent=v;b.addEventListener('click',()=>{if(b.classList.contains('correct')||b.classList.contains('wrong'))return;clearInterval(ti);if(v===ans){const bonus=Math.round(time);const g=3+bonus;sumarRacha();pts+=last?g*2:g;b.classList.add('correct');document.getElementById('m4').className='msg good';document.getElementById('m4').textContent='🐑 Saltó! +'+(last?g*2:g);setTimeout(sub,400)}else{resetRacha();b.classList.add('wrong');document.getElementById('m4').className='msg bad';document.getElementById('m4').textContent='😴 Se asustó...';setTimeout(sub,700)}});box.appendChild(b)});
   }
   sub();
 }
 
 // ===== LAUNCHER =====
 function abrirJuego(tipo){
+  if(pet.vidas<=0){avisar('💔 Sin vidas. Vuelve en un rato');return}
   gameCancelled=false;
+  pet.juegos++;
+  pet.juegosPor[tipo]=true;
   document.getElementById('overlay').classList.add('show');
   const dif=calcularDif();
   document.getElementById('panelContenido').innerHTML=`
     <h2>Cargando...</h2>
     <div class="msg">🐣</div>`;
+  const finJuego=(tipo,npts)=>{
+    document.getElementById('overlay').classList.remove('show');
+    if(npts>0){
+      recompensar(tipo,npts);
+      const m={calculo:'🍖 +comida!',grid:'😊 +felicidad!',memoria:'⚡ +energía!',ovejas:'💤 +sueño!'}[tipo];
+      toast('🎉 '+npts+'pts · '+m);
+      if(tipo==='ovejas')explosionZzz();
+    }else{
+      pet.vidas=Math.max(0,pet.vidas-1);
+      guardar();actualizarMascota();
+      toast(pet.vidas>0?'😞 Sin puntos. -1 vida ('+pet.vidas+')':'💔 Sin vidas');
+    }
+  };
   setTimeout(()=>{
   if(gameCancelled)return;
   if(tipo==='calculo'){
-    juegoCalculo(dif,(pts)=>{
-      document.getElementById('overlay').classList.remove('show');
-      if(pts>0){recompensar('calculo',pts);toast('🍖 +'+pts+' de comida!')}
-      else toast('😞 Sin puntos esta vez');
-    });
+    juegoCalculo(dif,(pts)=>finJuego('calculo',pts));
   }else if(tipo==='grid'){
-    juegoGrid(dif,(pts)=>{
-      document.getElementById('overlay').classList.remove('show');
-      if(pts>0){recompensar('grid',pts);toast('😊 +'+pts+' de felicidad!')}
-      else toast('😞 Sin puntos esta vez');
-    });
+    juegoGrid(dif,(pts)=>finJuego('grid',pts));
   }else if(tipo==='memoria'){
-    juegoMemoria(dif,(pts)=>{
-      document.getElementById('overlay').classList.remove('show');
-      if(pts>0){recompensar('memoria',pts);toast('⚡ +'+pts+' de energía!')}
-      else toast('😞 Sin puntos esta vez');
-    });
+    juegoMemoria(dif,(pts)=>finJuego('memoria',pts));
   }else if(tipo==='ovejas'){
-    juegoOvejas(dif,(pts)=>{
-      document.getElementById('overlay').classList.remove('show');
-      if(pts>0){recompensar('ovejas',pts);explosionZzz()}
-      else toast('😞 Sin puntos esta vez');
-    });
+    juegoOvejas(dif,(pts)=>finJuego('ovejas',pts));
   }
   }, 200);
 }
@@ -475,12 +616,113 @@ function mostrarInstrucciones(){
 
     <b style="color:var(--teal)">💡 Consejo</b><br>
     No dejes que las barras lleguen a 0.<br>
-    Alterná los 4 juegos para mantenerla saludable.<br>
+    Alterná los 4 juegos para mantenerla saludable.<br><br>
+
+    <b style="color:var(--teal)">🔥 Adicción</b><br>
+    ❤️ <b>Vidas</b>: 3 por fallar. Se regeneran cada 2 min.<br>
+    🔥 <b>Racha</b>: 5 aciertos seguidos = bonus x2.<br>
+    🎯 <b>Meta diaria</b>: llená la barra para girar la 🎡 rueda.<br>
+    ✨ <b>Estrella</b>: tocala cuando aparezca = doble XP.<br>
+    🎁 <b>Vuelta</b>: si volvés después de un rato, bonus.<br>
     </div>
     <button class="btn" onclick="document.getElementById('overlay').classList.remove('show')">Cerrar</button>`;
 }
 
+// ===== RUEDA DIARIA =====
+const RUEDA=[
+  {e:'🍖',n:'+20 comida',f:()=>pet.hambre=Math.min(100,pet.hambre+20)},
+  {e:'😊',n:'+20 felicidad',f:()=>pet.felicidad=Math.min(100,pet.felicidad+20)},
+  {e:'⚡',n:'+20 energía',f:()=>pet.energia=Math.min(100,pet.energia+20)},
+  {e:'❤️',n:'+15 salud',f:()=>pet.salud=Math.min(100,pet.salud+15)},
+  {e:'⭐',n:'+15 estrellas',f:()=>pet.estrellas+=15},
+  {e:'✨',n:'+40 XP',f:()=>ganarXP(40)},
+  {e:'🍖',n:'+20 comida',f:()=>pet.hambre=Math.min(100,pet.hambre+20)},
+  {e:'⚡',n:'+20 energía',f:()=>pet.energia=Math.min(100,pet.energia+20)}
+];
+let ruedaGirando=false;
+function abrirRueda(){
+  if(pet.ruedaDia){toast('🎡 Ya giraste hoy. ¡Volvé mañana!');return}
+  if(pet.xpHoy<pet.metaHoy){toast('🎯 Completa la meta ('+pet.xpHoy+'/'+pet.metaHoy+')');return}
+  document.getElementById('overlay').classList.add('show');
+  const cols=['#8fd19e','#f5c96b','#ff9d76','#9ecbff','#e0a5c4','#b8d98a','#ffd27a','#a5d8e0'];
+  let sect='';
+  RUEDA.forEach((r,i)=>{
+    sect+=`<div class="rueda-sector" style="transform:rotate(${i*45}deg)"><span style="background:${cols[i]};border:2px solid var(--ink);border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center">${r.e}</span></div>`;
+  });
+  document.getElementById('panelContenido').innerHTML=`
+    <h2>🎡 Recompensa Diaria</h2>
+    <div class="sub">¡Completaste la meta! Girá para ganar</div>
+    <div class="rueda-ptr">▼</div>
+    <div class="rueda-circle" id="rueda" style="background:conic-gradient(${cols.join(',')})">${sect}</div>
+    <div class="msg" id="rm" style="min-height:36px">Un giro por día 🎁</div>
+    <button class="btn gold" id="btnGirar" onclick="girarRueda()">🎯 Girar</button>`;
+  ruedaGirando=false;
+}
+function girarRueda(){
+  if(ruedaGirando)return;ruedaGirando=true;
+  const t=Math.floor(Math.random()*RUEDA.length);
+  const rot=360*5-(t*45);
+  document.getElementById('rueda').style.transform='rotate('+rot+'deg)';
+  document.getElementById('btnGirar').style.opacity=.5;
+  setTimeout(()=>{
+    const r=RUEDA[t];r.f();
+    pet.ruedaDia=true;
+    guardar();actualizarMascota();
+    document.getElementById('rm').innerHTML='🎉 '+r.e+' '+r.n;
+    setTimeout(()=>document.getElementById('overlay').classList.remove('show'),1500);
+  },3200);
+}
+
+// ===== LOGROS MODAL =====
+function abrirLogros(){
+  document.getElementById('overlay').classList.add('show');
+  let h='<h2>🏆 Logros</h2><div class="sub">'+pet.logros.length+'/'+LOGROS.length+' desbloqueados</div>';
+  LOGROS.forEach(l=>{
+    const got=pet.logros.includes(l.id);
+    h+='<div class="logro-item '+(got?'':'locked')+'">'+l.icon+' '+l.nombre+(got?' ✅':' 🔒')+'</div>';
+  });
+  h+='<div style="margin-top:10px"><button class="btn" onclick="cancelarJuego()">Cerrar</button></div>';
+  document.getElementById('panelContenido').innerHTML=h;
+}
+
+// ===== BIENVENIDA =====
+function bienvenida(){
+  const now=Date.now();
+  const away=now-pet.lastVisit;
+  pet.lastVisit=now;
+  guardar();
+  if(away>300000){
+    pet.hambre=Math.min(100,pet.hambre+15);
+    pet.felicidad=Math.min(100,pet.felicidad+15);
+    pet.energia=Math.min(100,pet.energia+15);
+    pet.salud=Math.min(100,pet.salud+15);
+    ganarXP(30);
+    avisar('🎁 ¡Te esperaba! Bonus de vuelta',4000);
+    toast('🎁 ¡Bonus de vuelta! +15 stats');
+  }
+}
+
+// ===== TIMERS =====
+setInterval(()=>{
+  if(pet.eventoActivo){
+    const rest=Math.ceil((pet.eventoFin-Date.now())/1000);
+    if(rest<=0){pet.eventoActivo=false;pet.ultimoEvento=Date.now();document.getElementById('eventoBadge').style.display='none';}
+    else{const b=document.getElementById('eventoBadge');b.textContent='✨ '+rest+'s';b.style.display='block';}
+  }else{
+    spawnEvento();
+  }
+},1000);
+setInterval(()=>{
+  if(pet._sleep>0)return;
+  if(pet.hambre<25)avisar('😫 ¡Tengo hambre! Jugá 🧮 Carrera');
+  else if(pet.felicidad<25)avisar('😞 Estoy triste... jugá ⊞ Grid');
+  else if(pet.energia<25)avisar('😴 Cansado... jugá ⟳ Memoria');
+},18000);
+
+cargar();
+bienvenida();
 actualizarMascota();
+guardar();
 </script>
 </body>
 </html>
